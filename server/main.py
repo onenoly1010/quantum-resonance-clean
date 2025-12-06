@@ -42,7 +42,7 @@ async def health_check():
     """Health check endpoint"""
     return {
         "status": "healthy",
-        "supabase_configured": bool(os.getenv("SUPABASE_URL"))
+        "supabase_url_configured": bool(os.getenv("SUPABASE_URL"))
     }
 
 @app.get("/api/info")
