@@ -51,13 +51,7 @@ async def api_info():
     return {
         "api": "Quantum Resonance",
         "version": "1.0.0",
-        "endpoints": [
-            "/",
-            "/health",
-            "/api/info",
-            "/docs",
-            "/redoc"
-        ]
+        "endpoints": [route.path for route in app.routes]
     }
 
 if __name__ == "__main__":
