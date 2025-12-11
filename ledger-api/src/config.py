@@ -38,10 +38,18 @@ class Settings(BaseSettings):
     def __init__(self, **values):
         super().__init__(**values)
         # Validate JWT_SECRET_KEY is not using insecure default
-        if self.JWT_SECRET_KEY in ["your-secret-key-change-in-production", "CHANGE_ME", ""]:
+        weak_secrets = [
+            "your-secret-key-change-in-production", 
+            "CHANGE_ME", 
+            "secret", 
+            "password", 
+            "123456",
+            ""
+        ]
+        if self.JWT_SECRET_KEY in weak_secrets or len(self.JWT_SECRET_KEY) < 32:
             raise ValueError(
-                "JWT_SECRET_KEY must be set to a secure value. "
-                "Set it via environment variable or .env file."
+                "JWT_SECRET_KEY must be at least 32 characters long and not a common weak value. "
+                "Generate a strong secret using: openssl rand -hex 32"
             )
     
     @property

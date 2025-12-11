@@ -4,7 +4,7 @@ Defines database tables and relationships.
 """
 from sqlalchemy import (
     Column, String, Text, Boolean, DECIMAL, 
-    ForeignKey, CheckConstraint, Index, TIMESTAMP
+    ForeignKey, CheckConstraint, Index, TIMESTAMP, Computed
 )
 from sqlalchemy.dialects.postgresql import UUID, JSONB, INET
 from sqlalchemy.sql import func
@@ -125,7 +125,7 @@ class ReconciliationLog(Base):
     reconciliation_date = Column(TIMESTAMP(timezone=True), nullable=False)
     expected_balance = Column(DECIMAL(20, 8), nullable=False)
     actual_balance = Column(DECIMAL(20, 8), nullable=False)
-    # variance is a computed column in the database: GENERATED ALWAYS AS (actual_balance - expected_balance) STORED
+    variance = Column(DECIMAL(20, 8), Computed('actual_balance - expected_balance'))
     status = Column(String(50), nullable=False)
     notes = Column(Text)
     reconciled_by = Column(String(255))
