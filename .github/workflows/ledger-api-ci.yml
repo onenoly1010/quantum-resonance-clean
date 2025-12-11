@@ -1,0 +1,131 @@
+name: Ledger API CI
+
+on:
+  push:
+    branches: [ main, infra/ledger-api-v1 ]
+    paths:
+      - 'ledger-api/**'
+      - '.github/workflows/ledger-api-ci.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'ledger-api/**'
+      - '.github/workflows/ledger-api-ci.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_USER: ledger_user
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_DB: ledger_test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+        cache-dependency-path: 'ledger-api/requirements.txt'
+    
+    - name: Install dependencies
+      working-directory: ledger-api
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Run tests
+      working-directory: ledger-api
+      env:
+        DATABASE_URL: postgresql://ledger_user:test_password@localhost:5432/ledger_test_db
+        JWT_SECRET_KEY: test-secret-key-for-ci
+      run: |
+        pytest tests/ -v --cov=src --cov-report=xml --cov-report=term
+    
+    - name: Upload coverage reports
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./ledger-api/coverage.xml
+        flags: ledger-api
+        name: ledger-api-coverage
+        fail_ci_if_error: false
+
+  lint:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Install linting tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install black isort flake8
+    
+    - name: Check code formatting with black
+      working-directory: ledger-api
+      run: |
+        black --check src/ tests/
+    
+    - name: Check import sorting with isort
+      working-directory: ledger-api
+      run: |
+        isort --check-only src/ tests/
+    
+    - name: Lint with flake8
+      working-directory: ledger-api
+      run: |
+        # Stop the build if there are Python syntax errors or undefined names
+        flake8 src/ tests/ --count --select=E9,F63,F7,F82 --show-source --statistics
+        # Exit-zero treats all errors as warnings
+        flake8 src/ tests/ --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+  security:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      working-directory: ledger-api
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install bandit safety
+    
+    - name: Run security scan with bandit
+      working-directory: ledger-api
+      run: |
+        bandit -r src/ -f json -o bandit-report.json || true
+        bandit -r src/
+    
+    - name: Check dependencies for vulnerabilities
+      working-directory: ledger-api
+      run: |
+        safety check --json || true
+        safety check

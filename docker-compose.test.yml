@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:14
+    environment:
+      POSTGRES_USER: ledger_user
+      POSTGRES_PASSWORD: test_password
+      POSTGRES_DB: ledger_test_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_test_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ledger_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  ledger-api:
+    build:
+      context: ./ledger-api
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: postgresql://ledger_user:test_password@postgres:5432/ledger_test_db
+      JWT_SECRET_KEY: test-secret-key-for-testing
+      JWT_ALGORITHM: HS256
+      JWT_EXPIRATION_MINUTES: 60
+      API_V1_PREFIX: /api/v1
+      ALLOW_ORIGINS: http://localhost:3000,http://localhost:8000
+      HOST: 0.0.0.0
+      PORT: 8001
+      LOG_LEVEL: INFO
+    ports:
+      - "8001:8001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./ledger-api:/app
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8001 --reload
+
+  test-runner:
+    build:
+      context: ./ledger-api
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: postgresql://ledger_user:test_password@postgres:5432/ledger_test_db
+      JWT_SECRET_KEY: test-secret-key-for-testing
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./ledger-api:/app
+    command: pytest tests/ -v --cov=src --cov-report=html --cov-report=term
+
+volumes:
+  postgres_test_data:
