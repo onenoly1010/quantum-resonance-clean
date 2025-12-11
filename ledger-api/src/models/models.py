@@ -6,13 +6,15 @@ from sqlalchemy import (
     Column, String, Text, Boolean, DECIMAL, 
     ForeignKey, CheckConstraint, Index, TIMESTAMP, Computed, TypeDecorator
 )
-from sqlalchemy.dialects.postgresql import UUID as PG_UUID, JSON as PG_JSON, INET
+from sqlalchemy.dialects.postgresql import UUID as PG_UUID, JSONB as PG_JSONB, INET
 from sqlalchemy.types import CHAR, TEXT
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 import uuid as uuid_lib
 import json
+from decimal import Decimal
 from src.db.session import Base
+
 
 
 # Cross-database type decorators
@@ -52,14 +54,14 @@ class GUID(TypeDecorator):
 
 class JSON(TypeDecorator):
     """Platform-independent JSON type.
-    Uses PostgreSQL's JSON type, otherwise uses TEXT, storing as JSON-encoded strings.
+    Uses PostgreSQL's JSONB type, otherwise uses TEXT, storing as JSON-encoded strings.
     """
     impl = TEXT
     cache_ok = True
 
     def load_dialect_impl(self, dialect):
         if dialect.name == 'postgresql':
-            return dialect.type_descriptor(PG_JSON())
+            return dialect.type_descriptor(PG_JSONB())
         else:
             return dialect.type_descriptor(TEXT())
 
@@ -68,7 +70,8 @@ class JSON(TypeDecorator):
             return value
         else:
             if value is not None:
-                return json.dumps(value)
+                # Custom JSON encoder to handle UUID and Decimal
+                return json.dumps(value, default=self._json_serializer)
             return value
 
     def process_result_value(self, value, dialect):
@@ -78,6 +81,15 @@ class JSON(TypeDecorator):
             if value is not None:
                 return json.loads(value)
             return value
+    
+    @staticmethod
+    def _json_serializer(obj):
+        """Custom JSON serializer for objects not serializable by default."""
+        if isinstance(obj, uuid_lib.UUID):
+            return str(obj)
+        if isinstance(obj, Decimal):
+            return str(obj)
+        raise TypeError(f"Object of type {type(obj)} is not JSON serializable")
 
 
 class LogicalAccount(Base):
