@@ -1,0 +1,61 @@
+version: "3.8"
+
+services:
+  # PostgreSQL database for ledger
+  ledger-db:
+    image: postgres:15
+    container_name: ledger-db
+    environment:
+      POSTGRES_USER: ledger_user
+      POSTGRES_PASSWORD: ledger_password
+      POSTGRES_DB: ledger_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - ledger_db_data:/var/lib/postgresql/data
+      - ./ledger-api/sql/schema:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ledger_user -d ledger_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  
+  # Ledger API service
+  ledger-api:
+    build:
+      context: ./ledger-api
+      dockerfile: Dockerfile
+    container_name: ledger-api
+    environment:
+      DATABASE_URL: postgresql://ledger_user:ledger_password@ledger-db:5432/ledger_db
+      API_HOST: 0.0.0.0
+      API_PORT: 8001
+      API_DEBUG: "true"
+      JWT_SECRET_KEY: test-secret-key-change-in-production
+      GUARDIAN_WALLET_ADDRESS: jg4c...rgi
+      LOG_LEVEL: INFO
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./ledger-api:/app
+    depends_on:
+      ledger-db:
+        condition: service_healthy
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8001 --reload
+  
+  # Test runner service
+  ledger-api-test:
+    build:
+      context: ./ledger-api
+      dockerfile: Dockerfile
+    container_name: ledger-api-test
+    environment:
+      DATABASE_URL: sqlite:///:memory:
+    volumes:
+      - ./ledger-api:/app
+    command: pytest tests/ -v
+    profiles:
+      - test
+
+volumes:
+  ledger_db_data:
