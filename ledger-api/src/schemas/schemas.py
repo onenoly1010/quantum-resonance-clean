@@ -14,7 +14,7 @@ class LogicalAccountBase(BaseModel):
     account_name: str = Field(..., max_length=255)
     account_type: str = Field(..., pattern="^(asset|liability|equity|revenue|expense)$")
     description: Optional[str] = None
-    metadata: Dict[str, Any] = Field(default_factory=dict)
+    extra_metadata: Dict[str, Any] = Field(default_factory=dict)
     is_active: bool = True
 
 
@@ -28,7 +28,7 @@ class LogicalAccountUpdate(BaseModel):
     account_name: Optional[str] = Field(None, max_length=255)
     account_type: Optional[str] = Field(None, pattern="^(asset|liability|equity|revenue|expense)$")
     description: Optional[str] = None
-    metadata: Optional[Dict[str, Any]] = None
+    extra_metadata: Optional[Dict[str, Any]] = None
     is_active: Optional[bool] = None
 
 
@@ -50,7 +50,7 @@ class LedgerTransactionBase(BaseModel):
     transaction_type: str = Field(..., pattern="^(debit|credit)$")
     reference_id: Optional[str] = Field(None, max_length=255)
     description: Optional[str] = None
-    metadata: Dict[str, Any] = Field(default_factory=dict)
+    extra_metadata: Dict[str, Any] = Field(default_factory=dict)
 
 
 class LedgerTransactionCreate(LedgerTransactionBase):
