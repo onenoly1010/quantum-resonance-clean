@@ -3,7 +3,7 @@ Allocation service for managing fund allocation rules and execution.
 """
 from sqlalchemy.orm import Session
 from sqlalchemy import select
-from typing import List, Dict
+from typing import List, Dict, Optional
 from decimal import Decimal
 from uuid import UUID
 from datetime import datetime
@@ -138,7 +138,7 @@ class AllocationService:
         db: Session,
         rule_id: UUID,
         amount: Decimal,
-        reference_id: str = None
+        reference_id: Optional[str] = None
     ) -> List[LedgerTransaction]:
         """
         Execute an allocation rule for a given amount.
