@@ -14,7 +14,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from src.config import settings
 from src.db.session import Base
-from src.models import models  # Import all models
+from src.models import models  # noqa: F401 - imported for side effects (model registration)
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

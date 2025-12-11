@@ -2,7 +2,6 @@
 Reconciliation service for account balance verification and tracking.
 """
 from sqlalchemy.orm import Session
-from sqlalchemy import select, func
 from typing import Optional
 from decimal import Decimal
 from uuid import UUID
@@ -28,20 +27,21 @@ class ReconciliationService:
         Returns:
             Current account balance
         """
-        # Get all transactions for the account
-        transactions = db.query(LedgerTransaction).filter(
+        from sqlalchemy import case, func
+        
+        # Use database aggregation for better performance
+        result = db.query(
+            func.sum(
+                case(
+                    (LedgerTransaction.transaction_type == 'credit', LedgerTransaction.amount),
+                    else_=-LedgerTransaction.amount
+                )
+            )
+        ).filter(
             LedgerTransaction.account_id == account_id
-        ).all()
+        ).scalar()
         
-        balance = Decimal("0")
-        
-        for txn in transactions:
-            if txn.transaction_type == "credit":
-                balance += txn.amount
-            else:  # debit
-                balance -= txn.amount
-        
-        return balance
+        return result if result is not None else Decimal("0")
     
     @staticmethod
     def create_reconciliation(

@@ -10,7 +10,6 @@ from typing import Sequence, Union
 from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
-import os
 
 # revision identifiers, used by Alembic.
 revision: str = '001'
@@ -21,15 +20,6 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     """Apply the initial schema from SQL file."""
-    # Read and execute the SQL schema file
-    sql_file_path = os.path.join(
-        os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
-        'sql', 'schema', '001_initial_ledger.sql'
-    )
-    
-    # Note: In production, you might want to execute the SQL file directly
-    # For now, we'll create tables using Alembic operations to match the schema
-    
     # Create UUID extension
     op.execute('CREATE EXTENSION IF NOT EXISTS "uuid-ossp"')
     
@@ -108,6 +98,13 @@ def upgrade() -> None:
         sa.Column('resolved_at', sa.TIMESTAMP(timezone=True)),
         sa.CheckConstraint("status IN ('pending', 'matched', 'variance', 'resolved')")
     )
+    
+    # Add computed variance column
+    op.execute("""
+        ALTER TABLE reconciliation_log 
+        ADD COLUMN variance DECIMAL(20, 8) 
+        GENERATED ALWAYS AS (actual_balance - expected_balance) STORED
+    """)
     
     # Create indexes
     op.create_index('idx_ledger_transactions_account_id', 'ledger_transactions', ['account_id'])

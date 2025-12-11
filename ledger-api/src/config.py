@@ -4,16 +4,17 @@ Loads settings from environment variables.
 """
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import List
+import os
 
 
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
     
     # Database Configuration
-    DATABASE_URL: str = "postgresql://ledger_user:password@localhost:5432/ledger_db"
+    DATABASE_URL: str
     
     # JWT Authentication
-    JWT_SECRET_KEY: str = "your-secret-key-change-in-production"
+    JWT_SECRET_KEY: str
     JWT_ALGORITHM: str = "HS256"
     JWT_EXPIRATION_MINUTES: int = 60
     
@@ -33,6 +34,15 @@ class Settings(BaseSettings):
         case_sensitive=True,
         extra="ignore"
     )
+    
+    def __init__(self, **values):
+        super().__init__(**values)
+        # Validate JWT_SECRET_KEY is not using insecure default
+        if self.JWT_SECRET_KEY in ["your-secret-key-change-in-production", "CHANGE_ME", ""]:
+            raise ValueError(
+                "JWT_SECRET_KEY must be set to a secure value. "
+                "Set it via environment variable or .env file."
+            )
     
     @property
     def cors_origins(self) -> List[str]:

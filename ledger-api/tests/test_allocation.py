@@ -7,7 +7,7 @@ from uuid import uuid4
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from src.db.session import Base
-from src.models.models import LogicalAccount, AllocationRule, LedgerTransaction
+from src.models.models import LogicalAccount
 from src.services.allocation import AllocationService
 from src.schemas.schemas import AllocationRuleCreate, AllocationConfig
 

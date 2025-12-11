@@ -62,16 +62,12 @@ def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)) 
     )
     
     try:
+        # jwt.decode automatically validates expiration
         payload = jwt.decode(
             token, 
             settings.JWT_SECRET_KEY, 
             algorithms=[settings.JWT_ALGORITHM]
         )
-        
-        # Check if token is expired
-        exp = payload.get("exp")
-        if exp is None or datetime.fromtimestamp(exp) < datetime.utcnow():
-            raise credentials_exception
         
         return payload
         

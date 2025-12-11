@@ -45,7 +45,7 @@ class LogicalAccountResponse(LogicalAccountBase):
 class LedgerTransactionBase(BaseModel):
     """Base schema for ledger transaction."""
     account_id: UUID
-    amount: Decimal = Field(..., decimal_places=8)
+    amount: Decimal = Field(..., max_digits=20, decimal_places=8)
     currency: str = Field(default="USD", max_length=10)
     transaction_type: str = Field(..., pattern="^(debit|credit)$")
     reference_id: Optional[str] = Field(None, max_length=255)
@@ -72,7 +72,7 @@ class LedgerTransactionResponse(LedgerTransactionBase):
 class AllocationConfig(BaseModel):
     """Schema for allocation configuration item."""
     destination_account_id: UUID
-    percentage: Decimal = Field(..., ge=0, le=100)
+    percentage: Decimal = Field(..., max_digits=5, decimal_places=2, ge=0, le=100)
     priority: int = Field(..., ge=1)
 
 
@@ -133,8 +133,8 @@ class ReconciliationLogBase(BaseModel):
     """Base schema for reconciliation log."""
     account_id: UUID
     reconciliation_date: datetime
-    expected_balance: Decimal = Field(..., decimal_places=8)
-    actual_balance: Decimal = Field(..., decimal_places=8)
+    expected_balance: Decimal = Field(..., max_digits=20, decimal_places=8)
+    actual_balance: Decimal = Field(..., max_digits=20, decimal_places=8)
     status: str = Field(..., pattern="^(pending|matched|variance|resolved)$")
     notes: Optional[str] = None
     reconciled_by: Optional[str] = Field(None, max_length=255)

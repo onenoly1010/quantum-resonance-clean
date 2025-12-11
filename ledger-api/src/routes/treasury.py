@@ -5,7 +5,6 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from uuid import UUID
-from decimal import Decimal
 
 from src.db.session import get_db
 from src.models.models import LogicalAccount
