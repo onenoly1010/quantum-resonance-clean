@@ -386,6 +386,9 @@ async def test_allocation_atomicity(db_session, sample_accounts):
     await db_session.commit()
     await db_session.refresh(transaction)
     
+    # Store transaction ID before potential expiration
+    transaction_id = transaction.id
+    
     # Try to create allocations - should fail
     with pytest.raises(AllocationValidationError):
         await engine.create_allocations(
@@ -396,9 +399,9 @@ async def test_allocation_atomicity(db_session, sample_accounts):
     # Rollback the session
     await db_session.rollback()
     
-    # Verify no allocations were created
+    # Verify no allocations were created using the stored ID
     query = select(LedgerTransaction).where(
-        LedgerTransaction.parent_transaction_id == transaction.id
+        LedgerTransaction.parent_transaction_id == transaction_id
     )
     result = await db_session.execute(query)
     allocations = result.scalars().all()

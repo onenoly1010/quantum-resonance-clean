@@ -50,7 +50,7 @@ async def get_treasury_status(
             "id": str(account.id),
             "name": account.name,
             "balance": str(account.balance),
-            "metadata": account.metadata,
+            "metadata": account.account_metadata,
         })
         
         # Calculate totals

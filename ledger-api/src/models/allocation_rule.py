@@ -1,5 +1,5 @@
 """Allocation Rule Model"""
-from sqlalchemy import Column, String, Boolean, DateTime, Text
+from sqlalchemy import Column, String, Boolean, DateTime, Text, JSON
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.sql import func
 import uuid
@@ -19,7 +19,7 @@ class AllocationRule(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = Column(Text, nullable=False, unique=True, index=True)
     rules = Column(
-        JSONB,
+        JSON().with_variant(JSONB, "postgresql"),
         nullable=False,
         comment="JSONB array of allocation rules with destination_account_id, percentage, and description"
     )

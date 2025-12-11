@@ -57,7 +57,13 @@ async def create_transaction(
     
     # Create transaction
     transaction = LedgerTransaction(
-        **transaction_data.model_dump(),
+        type=transaction_data.type,
+        amount=transaction_data.amount,
+        currency=transaction_data.currency,
+        transaction_metadata=transaction_data.metadata,
+        description=transaction_data.description,
+        external_tx_hash=transaction_data.external_tx_hash,
+        logical_account_id=transaction_data.logical_account_id,
         status="PENDING",  # Always start as pending
     )
     

@@ -37,4 +37,26 @@ class LedgerTransactionResponse(LedgerTransactionBase):
     status: str = Field(..., description="Transaction status")
     parent_transaction_id: Optional[uuid.UUID] = Field(None, description="Parent transaction ID for allocations")
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
+    
+    @classmethod
+    def model_validate(cls, obj, **kwargs):
+        """Custom validation to handle transaction_metadata -> metadata mapping"""
+        if hasattr(obj, 'transaction_metadata'):
+            # Create a dict with the correct field names
+            data = {
+                'id': obj.id,
+                'type': obj.type,
+                'amount': obj.amount,
+                'currency': obj.currency,
+                'metadata': obj.transaction_metadata,
+                'description': obj.description,
+                'external_tx_hash': obj.external_tx_hash,
+                'logical_account_id': obj.logical_account_id,
+                'created_at': obj.created_at,
+                'updated_at': obj.updated_at,
+                'status': obj.status,
+                'parent_transaction_id': obj.parent_transaction_id,
+            }
+            return super().model_validate(data, **kwargs)
+        return super().model_validate(obj, **kwargs)

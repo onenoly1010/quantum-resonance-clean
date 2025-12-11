@@ -1,5 +1,5 @@
 """Ledger Transaction Model"""
-from sqlalchemy import Column, String, DECIMAL, DateTime, Text, ForeignKey
+from sqlalchemy import Column, String, DECIMAL, DateTime, Text, ForeignKey, JSON
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
@@ -35,7 +35,7 @@ class LedgerTransaction(Base):
         index=True,
         comment="Transaction status: PENDING, COMPLETED, FAILED, CANCELLED"
     )
-    metadata = Column(JSONB, default={}, nullable=False)
+    transaction_metadata = Column("metadata", JSON().with_variant(JSONB, "postgresql"), default={}, nullable=False)
     external_tx_hash = Column(Text, nullable=True, index=True)
     description = Column(Text, nullable=True)
     
@@ -57,7 +57,7 @@ class LedgerTransaction(Base):
     # Relationships
     logical_account = relationship("LogicalAccount", back_populates="transactions", foreign_keys=[logical_account_id])
     parent_transaction = relationship("LedgerTransaction", remote_side=[id], foreign_keys=[parent_transaction_id])
-    allocations = relationship("LedgerTransaction", remote_side=[parent_transaction_id], foreign_keys=[parent_transaction_id])
+    allocations = relationship("LedgerTransaction", remote_side=[parent_transaction_id], foreign_keys=[parent_transaction_id], overlaps="parent_transaction")
 
     def __repr__(self):
         return f"<LedgerTransaction(id={self.id}, type='{self.type}', amount={self.amount}, status='{self.status}')>"

@@ -180,7 +180,7 @@ class AllocationEngine:
                 logical_account_id=uuid.UUID(rule["destination_account_id"]),
                 parent_transaction_id=parent_transaction.id,
                 description=f"Allocation: {rule.get('description', 'Auto-allocated')} ({percentage}%)",
-                metadata={
+                transaction_metadata={
                     "allocation_rule_id": str(allocation_rule.id),
                     "allocation_rule_name": allocation_rule.name,
                     "allocation_percentage": str(percentage),

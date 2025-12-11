@@ -55,7 +55,7 @@ class AuditLogger:
             actor=actor,
             target_id=target_id,
             target_type=target_type,
-            details=details or {},
+            audit_details=details or {},
             ip_address=ip_address,
             user_agent=user_agent,
         )

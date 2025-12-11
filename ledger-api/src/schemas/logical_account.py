@@ -32,4 +32,21 @@ class LogicalAccountResponse(LogicalAccountBase):
     created_at: datetime
     updated_at: datetime
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
+    
+    @classmethod
+    def model_validate(cls, obj, **kwargs):
+        """Custom validation to handle account_metadata -> metadata mapping"""
+        if hasattr(obj, 'account_metadata'):
+            # Create a dict with the correct field names
+            data = {
+                'id': obj.id,
+                'name': obj.name,
+                'type': obj.type,
+                'metadata': obj.account_metadata,
+                'balance': obj.balance,
+                'created_at': obj.created_at,
+                'updated_at': obj.updated_at,
+            }
+            return super().model_validate(data, **kwargs)
+        return super().model_validate(obj, **kwargs)

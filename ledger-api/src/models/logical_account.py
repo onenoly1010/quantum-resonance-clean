@@ -1,5 +1,5 @@
 """Logical Account Model"""
-from sqlalchemy import Column, String, DECIMAL, DateTime, Text
+from sqlalchemy import Column, String, DECIMAL, DateTime, Text, JSON
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
@@ -25,7 +25,7 @@ class LogicalAccount(Base):
         index=True,
         comment="Account type: ASSET, LIABILITY, EQUITY, REVENUE, EXPENSE"
     )
-    metadata = Column(JSONB, default={}, nullable=False)
+    account_metadata = Column("metadata", JSON().with_variant(JSONB, "postgresql"), default={}, nullable=False)
     balance = Column(DECIMAL(30, 12), default=0, nullable=False, index=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
