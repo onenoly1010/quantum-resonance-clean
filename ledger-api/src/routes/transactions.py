@@ -34,7 +34,7 @@ async def create_transaction(
         status=transaction.status,
         logical_account_id=transaction.logical_account_id,
         parent_transaction_id=transaction.parent_transaction_id,
-        metadata=transaction.metadata
+        tx_metadata=transaction.metadata
     )
     
     db.add(tx)
