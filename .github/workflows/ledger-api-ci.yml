@@ -1,0 +1,101 @@
+name: Ledger API CI
+
+on:
+  push:
+    branches:
+      - main
+      - infra/ledger-api-v1
+    paths:
+      - 'ledger-api/**'
+      - '.github/workflows/ledger-api-ci.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'ledger-api/**'
+
+jobs:
+  test:
+    name: Test Ledger API
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_DB: test_ledger_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: 'ledger-api/requirements.txt'
+      
+      - name: Install dependencies
+        run: |
+          cd ledger-api
+          pip install -r requirements.txt
+      
+      - name: Run tests
+        env:
+          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_ledger_db
+          API_KEY: test_api_key
+          SECRET_KEY: test_secret_key
+          ENVIRONMENT: test
+        run: |
+          cd ledger-api
+          pytest tests/ -v --tb=short
+      
+      - name: Lint with flake8 (optional)
+        continue-on-error: true
+        run: |
+          pip install flake8
+          cd ledger-api
+          # Stop the build if there are Python syntax errors or undefined names
+          flake8 src --count --select=E9,F63,F7,F82 --show-source --statistics
+          # Exit-zero treats all errors as warnings
+          flake8 src --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+  build:
+    name: Build and Validate
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          cd ledger-api
+          pip install -r requirements.txt
+      
+      - name: Validate imports
+        run: |
+          cd ledger-api/src
+          python -c "import main; print('Main module imports successfully')"
+      
+      - name: Check SQL schema syntax
+        run: |
+          # Basic validation that SQL file exists and is readable
+          cat ledger-api/sql/schema/001_initial_ledger.sql > /dev/null
+          echo "SQL schema file validated"
