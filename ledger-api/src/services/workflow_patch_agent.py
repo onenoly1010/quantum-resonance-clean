@@ -7,7 +7,6 @@ from typing import List, Dict, Optional, Any
 from uuid import UUID
 from datetime import datetime
 import logging
-from pathlib import Path
 
 from src.models.models import WorkflowPatch, WorkflowAnalysis
 from src.schemas.schemas import (
