@@ -4,6 +4,7 @@ Entry point for the FastAPI application
 """
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
 from config import settings
 from routes import transactions, treasury, allocation_rules
 import logging
@@ -16,13 +17,29 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Lifespan context manager for startup and shutdown events"""
+    # Startup
+    logger.info(f"Starting Ledger API v{settings.API_VERSION}")
+    logger.info(f"Environment: {settings.ENVIRONMENT}")
+    logger.info(f"Documentation available at: /docs")
+    
+    yield
+    
+    # Shutdown
+    logger.info("Shutting down Ledger API")
+
+
 # Initialize FastAPI application
 app = FastAPI(
     title=settings.API_TITLE,
     description=settings.API_DESCRIPTION,
     version=settings.API_VERSION,
     docs_url="/docs",
-    redoc_url="/redoc"
+    redoc_url="/redoc",
+    lifespan=lifespan
 )
 
 # Configure CORS
@@ -60,20 +77,6 @@ async def health_check():
         "service": "Ledger API",
         "version": settings.API_VERSION
     }
-
-
-@app.on_event("startup")
-async def startup_event():
-    """Execute on application startup"""
-    logger.info(f"Starting Ledger API v{settings.API_VERSION}")
-    logger.info(f"Environment: {settings.ENVIRONMENT}")
-    logger.info(f"Documentation available at: /docs")
-
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    """Execute on application shutdown"""
-    logger.info("Shutting down Ledger API")
 
 
 if __name__ == "__main__":

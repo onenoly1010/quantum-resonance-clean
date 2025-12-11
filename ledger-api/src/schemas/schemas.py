@@ -2,7 +2,7 @@
 Pydantic schemas for request/response validation
 Defines data transfer objects for API endpoints
 """
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 from typing import Optional, Dict, Any, List
 from datetime import datetime
 from decimal import Decimal
@@ -58,10 +58,11 @@ class LedgerTransactionBase(BaseModel):
     status: str = Field(default="pending", pattern="^(pending|posted|reversed|cancelled)$")
     metadata: Optional[Dict[str, Any]] = Field(default_factory=dict)
     
-    @validator('debit_account_id', 'credit_account_id')
-    def validate_different_accounts(cls, v, values):
+    @field_validator('credit_account_id')
+    @classmethod
+    def validate_different_accounts(cls, v, info):
         """Ensure debit and credit accounts are different"""
-        if 'debit_account_id' in values and v == values['debit_account_id']:
+        if info.data.get('debit_account_id') == v:
             raise ValueError('Debit and credit accounts must be different')
         return v
 
@@ -98,10 +99,12 @@ class AllocationDestination(BaseModel):
     percentage: Optional[Decimal] = Field(None, ge=0, le=100)
     amount: Optional[Decimal] = Field(None, ge=0)
     
-    @validator('percentage', 'amount')
-    def validate_percentage_or_amount(cls, v, values):
+    @field_validator('amount')
+    @classmethod
+    def validate_percentage_or_amount(cls, v, info):
         """Ensure either percentage or amount is provided, but not both"""
-        if 'percentage' in values and values.get('percentage') and v:
+        percentage = info.data.get('percentage')
+        if percentage is not None and v is not None:
             raise ValueError('Cannot specify both percentage and amount')
         return v
 
