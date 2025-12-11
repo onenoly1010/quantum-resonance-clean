@@ -249,3 +249,5 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+ledger-api/.venv/
+ledger-api/.pytest_cache/
