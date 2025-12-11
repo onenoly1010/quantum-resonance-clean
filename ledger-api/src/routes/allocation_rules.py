@@ -3,7 +3,7 @@ Allocation rules routes for managing fund allocation.
 """
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
 from uuid import UUID
 from decimal import Decimal
 
