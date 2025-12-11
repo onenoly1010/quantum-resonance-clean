@@ -169,3 +169,119 @@ class AccountBalanceResponse(BaseModel):
     balance: Decimal
     currency: str = "USD"
     last_transaction_date: Optional[datetime] = None
+
+
+# Workflow Patch Schemas
+class PatchContent(BaseModel):
+    """Schema for patch content details."""
+    files_modified: List[str] = Field(default_factory=list)
+    changes: Dict[str, Any] = Field(default_factory=dict)
+    dependencies: List[str] = Field(default_factory=list)
+    configuration: Dict[str, Any] = Field(default_factory=dict)
+
+
+class WorkflowPatchBase(BaseModel):
+    """Base schema for workflow patch."""
+    patch_name: str = Field(..., max_length=255)
+    patch_version: str = Field(..., max_length=50)
+    patch_type: str = Field(..., pattern="^(bug_fix|performance|security|feature|refactor)$")
+    description: str
+    target_workflow: str = Field(..., max_length=255)
+    issue_identified: str
+    patch_content: PatchContent
+    severity: str = Field(..., pattern="^(critical|high|medium|low)$")
+    deployment_config: Optional[Dict[str, Any]] = None
+    rollback_config: Optional[Dict[str, Any]] = None
+
+
+class WorkflowPatchCreate(WorkflowPatchBase):
+    """Schema for creating a workflow patch."""
+    pass
+
+
+class WorkflowPatchUpdate(BaseModel):
+    """Schema for updating a workflow patch."""
+    status: Optional[str] = Field(None, pattern="^(pending|testing|tested|approved|deployed|failed|rolled_back)$")
+    reviewed_by: Optional[str] = None
+    approved_by: Optional[str] = None
+    test_results: Optional[Dict[str, Any]] = None
+    impact_report: Optional[Dict[str, Any]] = None
+
+
+class WorkflowPatchResponse(WorkflowPatchBase):
+    """Schema for workflow patch response."""
+    id: UUID
+    status: str
+    created_by: str
+    reviewed_by: Optional[str] = None
+    approved_by: Optional[str] = None
+    test_results: Optional[Dict[str, Any]] = None
+    impact_report: Optional[Dict[str, Any]] = None
+    created_at: datetime
+    tested_at: Optional[datetime] = None
+    deployed_at: Optional[datetime] = None
+    rolled_back_at: Optional[datetime] = None
+    
+    model_config = ConfigDict(from_attributes=True)
+
+
+# Workflow Analysis Schemas
+class AnalysisFindings(BaseModel):
+    """Schema for analysis findings."""
+    issues: List[Dict[str, Any]] = Field(default_factory=list)
+    inefficiencies: List[Dict[str, Any]] = Field(default_factory=list)
+    opportunities: List[Dict[str, Any]] = Field(default_factory=list)
+
+
+class WorkflowAnalysisBase(BaseModel):
+    """Base schema for workflow analysis."""
+    workflow_name: str = Field(..., max_length=255)
+    analysis_type: str = Field(..., pattern="^(security|performance|efficiency|compatibility|quality)$")
+    findings: AnalysisFindings
+    metrics: Optional[Dict[str, Any]] = None
+    recommendations: Optional[List[Dict[str, Any]]] = None
+    severity: str = Field(..., pattern="^(critical|high|medium|low|info)$")
+
+
+class WorkflowAnalysisCreate(WorkflowAnalysisBase):
+    """Schema for creating a workflow analysis."""
+    pass
+
+
+class WorkflowAnalysisUpdate(BaseModel):
+    """Schema for updating a workflow analysis."""
+    status: Optional[str] = Field(None, pattern="^(new|in_progress|addressed|ignored)$")
+
+
+class WorkflowAnalysisResponse(WorkflowAnalysisBase):
+    """Schema for workflow analysis response."""
+    id: UUID
+    status: str
+    analyzed_by: str
+    created_at: datetime
+    addressed_at: Optional[datetime] = None
+    
+    model_config = ConfigDict(from_attributes=True)
+
+
+# Patch Agent Report Schemas
+class PatchDeploymentReport(BaseModel):
+    """Schema for patch deployment report."""
+    patch_id: UUID
+    patch_name: str
+    deployment_status: str
+    deployment_time: datetime
+    impact_summary: Dict[str, Any]
+    issues_fixed: List[str]
+    rollback_available: bool
+
+
+class WorkflowHealthReport(BaseModel):
+    """Schema for workflow health report."""
+    workflow_name: str
+    health_score: float = Field(..., ge=0, le=100)
+    issues_identified: int
+    patches_pending: int
+    patches_deployed: int
+    last_analysis: datetime
+    critical_issues: List[str] = Field(default_factory=list)

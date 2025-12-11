@@ -143,3 +143,83 @@ class ReconciliationLog(Base):
         Index("idx_reconciliation_log_account_id", "account_id"),
         Index("idx_reconciliation_log_status", "status"),
     )
+
+
+class WorkflowPatch(Base):
+    """Workflow patch model for automated patch management."""
+    __tablename__ = "workflow_patches"
+    
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    patch_name = Column(String(255), nullable=False)
+    patch_version = Column(String(50), nullable=False)
+    patch_type = Column(String(50), nullable=False)
+    description = Column(Text, nullable=False)
+    target_workflow = Column(String(255), nullable=False)
+    issue_identified = Column(Text, nullable=False)
+    patch_content = Column(JSONB, nullable=False)
+    status = Column(String(50), nullable=False, default='pending')
+    severity = Column(String(50), nullable=False)
+    created_by = Column(String(255), default='WorkflowPatchAgent')
+    reviewed_by = Column(String(255))
+    approved_by = Column(String(255))
+    test_results = Column(JSONB)
+    deployment_config = Column(JSONB)
+    rollback_config = Column(JSONB)
+    impact_report = Column(JSONB)
+    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+    tested_at = Column(TIMESTAMP(timezone=True))
+    deployed_at = Column(TIMESTAMP(timezone=True))
+    rolled_back_at = Column(TIMESTAMP(timezone=True))
+    
+    __table_args__ = (
+        CheckConstraint(
+            "patch_type IN ('bug_fix', 'performance', 'security', 'feature', 'refactor')",
+            name="check_patch_type"
+        ),
+        CheckConstraint(
+            "status IN ('pending', 'testing', 'tested', 'approved', 'deployed', 'failed', 'rolled_back')",
+            name="check_patch_status"
+        ),
+        CheckConstraint(
+            "severity IN ('critical', 'high', 'medium', 'low')",
+            name="check_patch_severity"
+        ),
+        Index("idx_workflow_patches_status", "status"),
+        Index("idx_workflow_patches_target_workflow", "target_workflow"),
+        Index("idx_workflow_patches_created_at", "created_at"),
+    )
+
+
+class WorkflowAnalysis(Base):
+    """Workflow analysis model for tracking workflow health and issues."""
+    __tablename__ = "workflow_analysis"
+    
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    workflow_name = Column(String(255), nullable=False)
+    analysis_type = Column(String(50), nullable=False)
+    findings = Column(JSONB, nullable=False)
+    metrics = Column(JSONB)
+    recommendations = Column(JSONB)
+    severity = Column(String(50), nullable=False)
+    status = Column(String(50), nullable=False, default='new')
+    analyzed_by = Column(String(255), default='WorkflowPatchAgent')
+    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+    addressed_at = Column(TIMESTAMP(timezone=True))
+    
+    __table_args__ = (
+        CheckConstraint(
+            "analysis_type IN ('security', 'performance', 'efficiency', 'compatibility', 'quality')",
+            name="check_analysis_type"
+        ),
+        CheckConstraint(
+            "severity IN ('critical', 'high', 'medium', 'low', 'info')",
+            name="check_analysis_severity"
+        ),
+        CheckConstraint(
+            "status IN ('new', 'in_progress', 'addressed', 'ignored')",
+            name="check_analysis_status"
+        ),
+        Index("idx_workflow_analysis_workflow_name", "workflow_name"),
+        Index("idx_workflow_analysis_status", "status"),
+        Index("idx_workflow_analysis_severity", "severity"),
+    )
