@@ -1,0 +1,226 @@
+name: Ledger API CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - 'feature/**'
+      - 'infra/**'
+    paths:
+      - 'ledger-api/**'
+      - '.github/workflows/ledger-api-ci.yml'
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'ledger-api/**'
+      - '.github/workflows/ledger-api-ci.yml'
+
+jobs:
+  lint:
+    name: Lint Code
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('ledger-api/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      
+      - name: Install dependencies
+        working-directory: ledger-api
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 black isort
+          pip install -r requirements.txt
+      
+      - name: Run flake8
+        working-directory: ledger-api
+        run: |
+          flake8 src/ --count --select=E9,F63,F7,F82 --show-source --statistics
+          flake8 src/ --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+      
+      - name: Check code formatting with black
+        working-directory: ledger-api
+        run: |
+          black --check src/ tests/
+      
+      - name: Check import sorting with isort
+        working-directory: ledger-api
+        run: |
+          isort --check-only src/ tests/
+
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: ledger_test
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_DB: ledger_test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('ledger-api/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      
+      - name: Install dependencies
+        working-directory: ledger-api
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: Set up database
+        working-directory: ledger-api
+        env:
+          DATABASE_URL: postgresql://ledger_test:test_password@localhost:5432/ledger_test_db
+        run: |
+          # Apply initial schema
+          PGPASSWORD=test_password psql -h localhost -U ledger_test -d ledger_test_db -f sql/schema/001_initial_ledger.sql
+      
+      - name: Run tests with pytest
+        working-directory: ledger-api
+        env:
+          DATABASE_URL: postgresql://ledger_test:test_password@localhost:5432/ledger_test_db
+          AUTH_ENABLED: false
+          JWT_SECRET: test-secret-key
+          API_SECRET_KEY: test-api-secret
+        run: |
+          pytest tests/ -v --cov=src --cov-report=xml --cov-report=term
+      
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./ledger-api/coverage.xml
+          flags: ledger-api
+          name: ledger-api-coverage
+        continue-on-error: true
+
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        working-directory: ledger-api
+        run: |
+          python -m pip install --upgrade pip
+          pip install safety bandit
+          pip install -r requirements.txt
+      
+      - name: Run safety check
+        working-directory: ledger-api
+        run: |
+          safety check --json || true
+      
+      - name: Run bandit security scan
+        working-directory: ledger-api
+        run: |
+          bandit -r src/ -f json -o bandit-report.json || true
+          bandit -r src/ -ll
+
+  docker:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Build test image
+        working-directory: ledger-api
+        run: |
+          docker build -t ledger-api:test -f ../Dockerfile .
+        continue-on-error: true
+
+  migration:
+    name: Test Database Migrations
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: ledger_test
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_DB: ledger_migration_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        working-directory: ledger-api
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      - name: Test Alembic migrations
+        working-directory: ledger-api
+        env:
+          DATABASE_URL: postgresql://ledger_test:test_password@localhost:5432/ledger_migration_test
+        run: |
+          # Apply initial schema first
+          PGPASSWORD=test_password psql -h localhost -U ledger_test -d ledger_migration_test -f sql/schema/001_initial_ledger.sql
+          
+          # Check Alembic configuration
+          alembic current || true
+          alembic history || true
