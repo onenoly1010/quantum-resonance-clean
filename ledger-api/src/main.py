@@ -4,7 +4,7 @@ Main FastAPI application for Ledger API.
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from src.config import settings
-from src.routes import transactions, treasury, allocation_rules
+from src.routes import transactions, treasury, allocation_rules, workflow_patches
 
 # Create FastAPI app
 app = FastAPI(
@@ -28,6 +28,7 @@ app.add_middleware(
 app.include_router(transactions.router, prefix=settings.API_V1_PREFIX)
 app.include_router(treasury.router, prefix=settings.API_V1_PREFIX)
 app.include_router(allocation_rules.router, prefix=settings.API_V1_PREFIX)
+app.include_router(workflow_patches.router, prefix=settings.API_V1_PREFIX)
 
 
 @app.get("/")
