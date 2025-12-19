@@ -290,6 +290,65 @@ class TestAllocationService:
         # Verify allocations sum to total
         total_allocated = sum(a["amount"] for a in allocations)
         assert total_allocated == Decimal("1000.00")
+    
+    def test_allocation_percentage_validation(self, db_session, sample_accounts):
+        """Test that allocation fails when percentages don't sum to 100%"""
+        rule = AllocationRule(
+            rule_id="RULE-INVALID-PCT",
+            rule_name="Invalid Percentage Allocation",
+            source_account_id="TREASURY",
+            allocation_config=[
+                {
+                    "destination_account_id": "OPERATIONS",
+                    "percentage": 50.0
+                },
+                {
+                    "destination_account_id": "RESERVE",
+                    "percentage": 30.0
+                }
+                # Total is only 80%, should fail
+            ],
+            is_active=True,
+            priority=1
+        )
+        db_session.add(rule)
+        db_session.commit()
+        
+        service = AllocationService(db_session)
+        
+        # Should raise ValueError when percentages don't sum to 100%
+        with pytest.raises(ValueError, match="percentages must sum to 100%"):
+            service.calculate_allocations(Decimal("1000.00"), rule)
+    
+    def test_allocation_conditional_percentage_validation(self, db_session, sample_accounts):
+        """Test that allocation fails when conditional percentages don't sum to 100%"""
+        rule = AllocationRule(
+            rule_id="RULE-CONDITIONAL-INVALID",
+            rule_name="Conditional Invalid Allocation",
+            source_account_id="TREASURY",
+            allocation_config=[
+                {
+                    "destination_account_id": "OPERATIONS",
+                    "percentage": 60.0,
+                    "condition": "amount > 500"  # This condition will be met
+                },
+                {
+                    "destination_account_id": "RESERVE",
+                    "percentage": 20.0
+                }
+                # When condition is met, total is only 80%
+            ],
+            is_active=True,
+            priority=1
+        )
+        db_session.add(rule)
+        db_session.commit()
+        
+        service = AllocationService(db_session)
+        
+        # Should raise ValueError when applicable percentages don't sum to 100%
+        with pytest.raises(ValueError, match="percentages must sum to 100%"):
+            service.calculate_allocations(Decimal("1000.00"), rule)
 
 
 if __name__ == "__main__":

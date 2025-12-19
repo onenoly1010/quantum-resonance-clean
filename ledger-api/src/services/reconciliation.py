@@ -78,11 +78,16 @@ class ReconciliationService:
             })
         
         # Check for balanced batch transactions (each batch should have balanced debits/credits)
+        # Note: We need to check ALL transactions in a batch, not just those in the time period
         batch_ids = set(t.batch_id for t in transactions if t.batch_id)
         for batch_id in batch_ids:
-            batch_transactions = [t for t in transactions if t.batch_id == batch_id]
-            debits = sum(t.amount for t in batch_transactions if t.transaction_type == "DEBIT")
-            credits = sum(t.amount for t in batch_transactions if t.transaction_type == "CREDIT")
+            # Get ALL transactions for this batch, not just those in the time period
+            all_batch_transactions = self.db.query(LedgerTransaction).filter(
+                LedgerTransaction.batch_id == batch_id
+            ).all()
+            
+            debits = sum(t.amount for t in all_batch_transactions if t.transaction_type == "DEBIT")
+            credits = sum(t.amount for t in all_batch_transactions if t.transaction_type == "CREDIT")
             
             if abs(debits - credits) > Decimal("0.00000001"):  # Allow tiny rounding errors
                 discrepancies.append({
@@ -90,7 +95,8 @@ class ReconciliationService:
                     "batch_id": batch_id,
                     "debits": float(debits),
                     "credits": float(credits),
-                    "difference": float(abs(debits - credits))
+                    "difference": float(abs(debits - credits)),
+                    "note": "Batch balance check includes all transactions in batch, not just those in time period"
                 })
         
         # If no discrepancies found, all records are matched
