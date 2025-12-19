@@ -6,6 +6,22 @@
 
 This repository provides a clean, production-ready setup for the Pi Forge Quantum Genesis project. It includes automated installation scripts, Docker support, and comprehensive documentation to get you started quickly.
 
+## 🤖 Autonomous Agent Ecosystem
+
+This repository uses a multi-agent system governed by the [Canon of Autonomy](.github/CANON_OF_AUTONOMY.md).
+
+### Quick Start
+- **New contributors**: See [`.github/AGENTS/ONBOARDING_AGENT.md`](.github/AGENTS/ONBOARDING_AGENT.md)
+- **Need help?**: Open an issue with the appropriate template
+- **Understanding the system**: Read [`MASTER_HANDOFF_MANIFEST.md`](MASTER_HANDOFF_MANIFEST.md)
+
+### Agent System
+- **GitHub Agent** - Coordinates all agents ([`.github/GITHUB_AGENT_INSTRUCTIONS.md`](.github/GITHUB_AGENT_INSTRUCTIONS.md))
+- **8 Specialist Agents** - Coding, Testing, Documentation, Creativity, Design, Steward, Governance, Onboarding
+- **Complete map**: [`.github/AGENTS/README.md`](.github/AGENTS/README.md)
+
+The system is designed to be sovereign, transparent, and self-sustaining.
+
 ## Features
 
 - 🚀 **Automated Installation**: One-command setup for both Linux/Mac and Windows
