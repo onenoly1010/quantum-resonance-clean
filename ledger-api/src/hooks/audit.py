@@ -3,7 +3,7 @@
 from sqlalchemy.orm import Session
 from typing import Optional, Dict, Any
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 
 from models.models import AuditLog
 
@@ -50,7 +50,7 @@ class AuditHook:
             old_value=old_value,
             new_value=new_value,
             changed_by=changed_by,
-            changed_at=datetime.utcnow(),
+            changed_at=datetime.now(timezone.utc),
             ip_address=ip_address,
             user_agent=user_agent,
             metadata=metadata or {}

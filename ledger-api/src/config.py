@@ -1,7 +1,6 @@
 """Configuration management for Ledger API"""
 
 from pydantic_settings import BaseSettings
-from typing import Optional
 
 
 class Settings(BaseSettings):
@@ -17,6 +16,7 @@ class Settings(BaseSettings):
     API_TITLE: str = "Ledger API"
     API_VERSION: str = "1.0.0"
     API_DESCRIPTION: str = "Double-entry bookkeeping system with allocation engine"
+    ALLOWED_ORIGINS: str = "http://localhost:3000,http://localhost:8000"
     
     # Authentication
     JWT_SECRET_KEY: str = "your-secret-key-change-in-production"

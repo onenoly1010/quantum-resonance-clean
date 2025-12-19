@@ -1,13 +1,12 @@
 """Allocation service for automated fund distribution"""
 
 from sqlalchemy.orm import Session
-from decimal import Decimal
+from decimal import Decimal, ROUND_DOWN
 from typing import List, Dict, Any, Optional
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 
-from models.models import AllocationRule, LedgerTransaction, LogicalAccount
-from schemas.schemas import AllocationDestination
+from models.models import AllocationRule, LedgerTransaction
 
 
 class AllocationService:
@@ -62,6 +61,7 @@ class AllocationService:
             List of allocation details with account_id and amount
         """
         allocations = []
+        total_allocated = Decimal("0")
         
         # Parse allocation config
         config = rule.allocation_config
@@ -69,29 +69,62 @@ class AllocationService:
             import json
             config = json.loads(config)
         
+        # Filter allocations based on conditions
+        applicable_destinations = []
         for allocation_dest in config:
             dest_account_id = allocation_dest.get("destination_account_id")
             percentage = Decimal(str(allocation_dest.get("percentage", 0)))
             condition = allocation_dest.get("condition")
             
-            # Evaluate condition if present (simple amount check for now)
+            # Evaluate condition if present with safe evaluation
             if condition:
-                # Simple condition evaluation: "amount > 1000"
-                if ">" in condition:
-                    threshold = Decimal(condition.split(">")[1].strip())
-                    if amount <= threshold:
-                        continue
-                elif "<" in condition:
-                    threshold = Decimal(condition.split("<")[1].strip())
-                    if amount >= threshold:
-                        continue
+                # Only support simple numeric comparisons for security
+                try:
+                    if ">" in condition:
+                        parts = condition.split(">")
+                        if len(parts) == 2 and parts[0].strip().lower() == "amount":
+                            threshold = Decimal(parts[1].strip())
+                            if amount <= threshold:
+                                continue
+                    elif "<" in condition:
+                        parts = condition.split("<")
+                        if len(parts) == 2 and parts[0].strip().lower() == "amount":
+                            threshold = Decimal(parts[1].strip())
+                            if amount >= threshold:
+                                continue
+                except (ValueError, IndexError):
+                    # Skip this destination if condition is malformed
+                    continue
             
-            # Calculate allocation amount
-            allocation_amount = (amount * percentage / Decimal("100")).quantize(Decimal("0.00000001"))
+            applicable_destinations.append({
+                "destination_account_id": dest_account_id,
+                "percentage": percentage
+            })
+        
+        # Validate that percentages sum to 100
+        total_percentage = sum(d["percentage"] for d in applicable_destinations)
+        if abs(total_percentage - Decimal("100")) > Decimal("0.01"):
+            raise ValueError(
+                f"Allocation percentages must sum to 100%, got {total_percentage}%. "
+                f"This can occur when conditions exclude some destinations."
+            )
+        
+        # Calculate allocation amounts with 12 decimal places using ROUND_DOWN
+        for i, dest in enumerate(applicable_destinations):
+            if i < len(applicable_destinations) - 1:
+                # Use ROUND_DOWN for all but the last allocation
+                allocation_amount = (amount * dest["percentage"] / Decimal("100")).quantize(
+                    Decimal("0.000000000001"), rounding=ROUND_DOWN
+                )
+            else:
+                # Assign remainder to last allocation to ensure exact total
+                allocation_amount = amount - total_allocated
+            
+            total_allocated += allocation_amount
             
             allocations.append({
-                "destination_account_id": dest_account_id,
-                "percentage": float(percentage),
+                "destination_account_id": dest["destination_account_id"],
+                "percentage": float(dest["percentage"]),
                 "amount": allocation_amount
             })
         
@@ -184,7 +217,7 @@ class AllocationService:
             "rule_id": rule.rule_id,
             "rule_name": rule.rule_name,
             "allocations": allocations,
-            "created_at": datetime.utcnow()
+            "created_at": datetime.now(timezone.utc)
         }
     
     def get_account_balance(self, account_id: str) -> Decimal:

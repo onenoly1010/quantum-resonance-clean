@@ -7,8 +7,6 @@ Create Date: 2025-12-11
 """
 from typing import Sequence, Union
 from alembic import op
-import sqlalchemy as sa
-from sqlalchemy.dialects import postgresql
 import os
 
 # revision identifiers, used by Alembic.
@@ -37,10 +35,11 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    """Rollback the initial schema."""
+    """Rollback the initial schema in reverse dependency order."""
+    # Drop tables in reverse order to avoid foreign key constraint violations
+    op.execute('DROP FUNCTION IF EXISTS update_updated_at_column() CASCADE')
     op.drop_table('reconciliation_log')
     op.drop_table('audit_log')
     op.drop_table('allocation_rules')
     op.drop_table('ledger_transactions')
     op.drop_table('logical_accounts')
-    op.execute('DROP FUNCTION IF EXISTS update_updated_at_column() CASCADE')

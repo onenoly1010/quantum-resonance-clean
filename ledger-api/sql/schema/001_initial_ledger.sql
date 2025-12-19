@@ -15,8 +15,7 @@ CREATE TABLE IF NOT EXISTS logical_accounts (
     FOREIGN KEY (parent_account_id) REFERENCES logical_accounts(account_id) ON DELETE SET NULL
 );
 
--- Create index on account_id for faster lookups
-CREATE INDEX idx_logical_accounts_account_id ON logical_accounts(account_id);
+-- Create indexes (unique constraint already creates index for account_id)
 CREATE INDEX idx_logical_accounts_type ON logical_accounts(account_type);
 CREATE INDEX idx_logical_accounts_parent ON logical_accounts(parent_account_id);
 
@@ -38,8 +37,7 @@ CREATE TABLE IF NOT EXISTS ledger_transactions (
     FOREIGN KEY (account_id) REFERENCES logical_accounts(account_id) ON DELETE RESTRICT
 );
 
--- Create indexes for transaction queries
-CREATE INDEX idx_ledger_transactions_transaction_id ON ledger_transactions(transaction_id);
+-- Create indexes (unique constraint already creates index for transaction_id)
 CREATE INDEX idx_ledger_transactions_account_id ON ledger_transactions(account_id);
 CREATE INDEX idx_ledger_transactions_batch_id ON ledger_transactions(batch_id);
 CREATE INDEX idx_ledger_transactions_created_at ON ledger_transactions(created_at);
@@ -62,8 +60,7 @@ CREATE TABLE IF NOT EXISTS allocation_rules (
     FOREIGN KEY (source_account_id) REFERENCES logical_accounts(account_id) ON DELETE RESTRICT
 );
 
--- Create indexes for allocation rules
-CREATE INDEX idx_allocation_rules_rule_id ON allocation_rules(rule_id);
+-- Create indexes (unique constraint already creates index for rule_id)
 CREATE INDEX idx_allocation_rules_source_account ON allocation_rules(source_account_id);
 CREATE INDEX idx_allocation_rules_active ON allocation_rules(is_active);
 CREATE INDEX idx_allocation_rules_priority ON allocation_rules(priority);

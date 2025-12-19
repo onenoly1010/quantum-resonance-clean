@@ -3,6 +3,7 @@
 from fastapi import FastAPI, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from contextlib import asynccontextmanager
 import logging
 
 from config import settings
@@ -15,18 +16,39 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """
+    Lifespan context manager for startup and shutdown events.
+    """
+    # Startup
+    logger.info(f"Starting {settings.API_TITLE} v{settings.API_VERSION}")
+    logger.info(f"Guardian wallet: {settings.GUARDIAN_WALLET_ADDRESS}")
+    
+    if settings.RECONCILIATION_CRON_ENABLED:
+        logger.info(f"Reconciliation scheduled every {settings.RECONCILIATION_INTERVAL_HOURS} hours")
+    
+    yield
+    
+    # Shutdown
+    logger.info(f"Shutting down {settings.API_TITLE}")
+
+
 # Initialize FastAPI application
 app = FastAPI(
     title=settings.API_TITLE,
     description=settings.API_DESCRIPTION,
     version=settings.API_VERSION,
-    debug=settings.API_DEBUG
+    debug=settings.API_DEBUG,
+    lifespan=lifespan
 )
 
-# Configure CORS
+# Configure CORS with allowed origins from settings
+allowed_origins = settings.ALLOWED_ORIGINS.split(",") if settings.ALLOWED_ORIGINS else []
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Configure appropriately for production
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -101,28 +123,6 @@ async def general_exception_handler(request, exc):
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content={"detail": "An internal error occurred"}
     )
-
-
-# Startup and shutdown events
-@app.on_event("startup")
-async def startup_event():
-    """Actions to perform on application startup"""
-    logger.info(f"Starting {settings.API_TITLE} v{settings.API_VERSION}")
-    logger.info(f"Guardian wallet: {settings.GUARDIAN_WALLET_ADDRESS}")
-    
-    # TODO: Initialize database connection pool
-    # TODO: Start reconciliation cron if enabled
-    if settings.RECONCILIATION_CRON_ENABLED:
-        logger.info(f"Reconciliation scheduled every {settings.RECONCILIATION_INTERVAL_HOURS} hours")
-
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    """Actions to perform on application shutdown"""
-    logger.info(f"Shutting down {settings.API_TITLE}")
-    
-    # TODO: Close database connections
-    # TODO: Stop reconciliation cron
 
 
 if __name__ == "__main__":

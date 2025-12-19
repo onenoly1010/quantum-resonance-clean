@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from decimal import Decimal
 from typing import List, Dict, Any, Optional
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 
 from models.models import ReconciliationLog, LedgerTransaction, LogicalAccount
 
@@ -33,7 +33,7 @@ class ReconciliationService:
             ReconciliationLog with results
         """
         if not end_time:
-            end_time = datetime.utcnow()
+            end_time = datetime.now(timezone.utc)
         if not start_time:
             # Default to last 30 days
             from datetime import timedelta
@@ -161,8 +161,8 @@ class ReconciliationService:
                     reconciliation_id=f"RECON-{uuid.uuid4().hex[:12].upper()}",
                     reconciliation_type="account_reconciliation",
                     account_id=account.account_id,
-                    start_time=start_time or datetime.utcnow(),
-                    end_time=end_time or datetime.utcnow(),
+                    start_time=start_time or datetime.now(timezone.utc),
+                    end_time=end_time or datetime.now(timezone.utc),
                     status="FAILED",
                     total_records=0,
                     matched_records=0,

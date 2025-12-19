@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List, Optional
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 
 from db.session import get_db
 from models.models import LedgerTransaction, LogicalAccount
@@ -15,6 +15,7 @@ from schemas.schemas import (
 )
 from deps.auth import get_current_user, get_optional_user
 from hooks.audit import AuditHook
+from services.allocation import AllocationService
 
 router = APIRouter(prefix="/api/v1/transactions", tags=["transactions"])
 
@@ -28,6 +29,7 @@ async def create_transaction(
     """
     Create a new ledger transaction.
     
+    If status equals COMPLETED (case-insensitive), triggers allocation engine.
     Requires authentication.
     """
     # Verify account exists
@@ -41,38 +43,71 @@ async def create_transaction(
             detail=f"Account not found: {transaction.account_id}"
         )
     
-    # Create transaction
-    db_transaction = LedgerTransaction(
-        transaction_id=f"TXN-{uuid.uuid4().hex[:12].upper()}",
-        account_id=transaction.account_id,
-        transaction_type=transaction.transaction_type,
-        amount=transaction.amount,
-        currency=transaction.currency,
-        description=transaction.description,
-        reference_id=transaction.reference_id,
-        metadata=transaction.metadata,
-        created_by=current_user,
-        source_system="api"
-    )
-    
-    db.add(db_transaction)
-    db.commit()
-    db.refresh(db_transaction)
-    
-    # Log to audit
-    AuditHook.log_transaction_create(
-        db=db,
-        transaction_id=db_transaction.transaction_id,
-        transaction_data={
-            "account_id": transaction.account_id,
-            "type": transaction.transaction_type,
-            "amount": str(transaction.amount),
-            "currency": transaction.currency
-        },
-        created_by=current_user
-    )
-    
-    return db_transaction
+    try:
+        # Create transaction
+        db_transaction = LedgerTransaction(
+            transaction_id=f"TXN-{uuid.uuid4().hex[:12].upper()}",
+            account_id=transaction.account_id,
+            transaction_type=transaction.transaction_type,
+            amount=transaction.amount,
+            currency=transaction.currency,
+            description=transaction.description,
+            reference_id=transaction.reference_id,
+            metadata=transaction.metadata,
+            created_by=current_user,
+            source_system="api"
+        )
+        
+        db.add(db_transaction)
+        db.flush()  # Flush to get transaction ID but don't commit yet
+        
+        # If status is COMPLETED, trigger allocation engine within same transaction
+        if transaction.status and transaction.status.upper() == "COMPLETED":
+            allocation_service = AllocationService(db)
+            try:
+                allocation_service.execute_allocation(
+                    amount=transaction.amount,
+                    source_account_id=transaction.account_id,
+                    description=f"Auto-allocation for transaction {db_transaction.transaction_id}",
+                    created_by=current_user
+                )
+            except ValueError as e:
+                # Rollback if allocation fails
+                db.rollback()
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Allocation failed: {str(e)}"
+                )
+        
+        # Commit transaction (includes allocation if triggered)
+        db.commit()
+        db.refresh(db_transaction)
+        
+        # Log to audit
+        AuditHook.log_transaction_create(
+            db=db,
+            transaction_id=db_transaction.transaction_id,
+            transaction_data={
+                "account_id": transaction.account_id,
+                "type": transaction.transaction_type,
+                "amount": str(transaction.amount),
+                "currency": transaction.currency,
+                "status": transaction.status
+            },
+            created_by=current_user
+        )
+        
+        return db_transaction
+        
+    except HTTPException:
+        # Re-raise HTTP exceptions
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Transaction creation failed: {str(e)}"
+        )
 
 
 @router.post("/double-entry", response_model=List[TransactionResponse], status_code=status.HTTP_201_CREATED)

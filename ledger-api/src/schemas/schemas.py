@@ -1,8 +1,8 @@
 """Pydantic schemas for request/response validation"""
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, condecimal
 from typing import Optional, List, Dict, Any
-from datetime import datetime
+from datetime import datetime, timezone
 from decimal import Decimal
 
 
@@ -46,10 +46,11 @@ class TransactionBase(BaseModel):
     """Base schema for transaction"""
     account_id: str = Field(..., max_length=100)
     transaction_type: str = Field(..., pattern="^(DEBIT|CREDIT)$")
-    amount: Decimal = Field(..., ge=0, decimal_places=8)
+    amount: condecimal(ge=0, decimal_places=8)
     currency: str = Field(default="USD", max_length=10)
     description: Optional[str] = None
     reference_id: Optional[str] = None
+    status: Optional[str] = None  # For allocation triggering
     metadata: Dict[str, Any] = Field(default_factory=dict)
 
 
@@ -62,7 +63,7 @@ class DoubleEntryTransactionCreate(BaseModel):
     """Schema for creating a double-entry transaction"""
     debit_account_id: str
     credit_account_id: str
-    amount: Decimal = Field(..., ge=0, decimal_places=8)
+    amount: condecimal(ge=0, decimal_places=8)
     currency: str = Field(default="USD", max_length=10)
     description: Optional[str] = None
     reference_id: Optional[str] = None
@@ -150,7 +151,7 @@ class TreasuryBalanceResponse(BaseModel):
 
 class AllocationRequest(BaseModel):
     """Schema for allocation request"""
-    amount: Decimal = Field(..., ge=0, decimal_places=8)
+    amount: condecimal(ge=0, decimal_places=8)
     source_account_id: str
     rule_id: Optional[str] = None
     description: Optional[str] = None
@@ -166,6 +167,18 @@ class AllocationResponse(BaseModel):
 
 
 # ============= Reconciliation Schemas =============
+
+class ReconciliationRequest(BaseModel):
+    """Schema for reconciliation request"""
+    logical_account_id: str
+    external_balance: condecimal(decimal_places=8)
+
+
+class ReconciliationSimpleResponse(BaseModel):
+    """Schema for simple reconciliation response"""
+    reconciliation_id: str
+    discrepancy: Decimal
+
 
 class ReconciliationResponse(BaseModel):
     """Schema for reconciliation response"""

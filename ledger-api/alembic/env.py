@@ -9,9 +9,10 @@ import sys
 # Add the src directory to the path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
-# Import your models
+# Import your models (imports needed for metadata)
 from db.session import Base
-from models.models import LogicalAccount, LedgerTransaction, AllocationRule, AuditLog, ReconciliationLog
+# Import models to ensure they're registered with Base.metadata
+from models import models  # noqa: F401
 
 # this is the Alembic Config object
 config = context.config

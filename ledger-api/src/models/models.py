@@ -2,11 +2,11 @@
 
 from sqlalchemy import (
     Column, Integer, String, Boolean, Numeric, DateTime, Text,
-    ForeignKey, CheckConstraint, Index, func
+    ForeignKey, CheckConstraint, Index
 )
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import relationship
-from datetime import datetime
+from datetime import datetime, timezone
 from db.session import Base
 
 

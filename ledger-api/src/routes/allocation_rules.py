@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List, Optional
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 
 from db.session import get_db
 from models.models import AllocationRule, LogicalAccount
@@ -13,7 +13,7 @@ from schemas.schemas import (
     AllocationRuleUpdate,
     AllocationRuleResponse
 )
-from deps.auth import get_current_user, require_guardian_role, get_optional_user
+from deps.auth import require_guardian_role, get_optional_user
 from hooks.audit import AuditHook
 
 router = APIRouter(prefix="/api/v1/allocation-rules", tags=["allocation-rules"])
@@ -70,7 +70,7 @@ async def create_allocation_rule(
         allocation_config=allocation_config,
         is_active=rule.is_active,
         priority=rule.priority,
-        effective_from=rule.effective_from or datetime.utcnow(),
+        effective_from=rule.effective_from or datetime.now(timezone.utc),
         effective_to=rule.effective_to,
         created_by=current_user
     )
@@ -205,7 +205,7 @@ async def update_allocation_rule(
     if rule_update.effective_to is not None:
         db_rule.effective_to = rule_update.effective_to
     
-    db_rule.updated_at = datetime.utcnow()
+    db_rule.updated_at = datetime.now(timezone.utc)
     
     db.commit()
     db.refresh(db_rule)
@@ -257,7 +257,7 @@ async def delete_allocation_rule(
     }
     
     db_rule.is_active = False
-    db_rule.updated_at = datetime.utcnow()
+    db_rule.updated_at = datetime.now(timezone.utc)
     
     db.commit()
     
