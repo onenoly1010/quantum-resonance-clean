@@ -1,0 +1,23 @@
+# Ensure text files are normalized to LF line endings
+* text=auto
+
+# Explicitly mark .gitignore as text
+.gitignore text
+
+# Ensure shell scripts have LF line endings
+*.sh text eol=lf
+
+# Ensure PowerShell scripts have CRLF line endings
+*.ps1 text eol=crlf
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.svg binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
