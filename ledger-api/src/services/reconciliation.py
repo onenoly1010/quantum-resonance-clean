@@ -141,7 +141,7 @@ class ReconciliationService:
             status="COMPLETED",
             logical_account_id=reconciliation.logical_account_id,
             description=f"Reconciliation correction - {notes or 'Balance adjustment'}",
-            metadata={
+            transaction_metadata={
                 "reconciliation_id": str(reconciliation.id),
                 "approved_by": approved_by,
                 "external_balance": str(reconciliation.external_balance),
