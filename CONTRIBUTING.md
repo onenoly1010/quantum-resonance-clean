@@ -2,6 +2,18 @@
 
 Thank you for your interest in contributing to the Pi Forge Quantum Genesis project!
 
+## Project Governance
+
+This project follows the **Canon of Autonomy** — a self-sustaining, non-hierarchical workflow that ensures clarity, continuity, and contributor sovereignty.
+
+For information about:
+- Core principles (sovereignty, transparency, inclusivity, non-hierarchy, safety)
+- Roles and responsibilities
+- Workflow and handoff guidelines
+- Governance and decision-making
+
+Please read **CANON_OF_AUTONOMY.md** at the repository root.
+
 ## Getting Started
 
 1. Fork the repository
