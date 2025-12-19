@@ -24,6 +24,7 @@ router = APIRouter(prefix="/api/v1/treasury", tags=["treasury"])
 
 
 @router.get("/balance", response_model=List[TreasuryBalanceResponse])
+@router.get("/status", response_model=List[TreasuryBalanceResponse])  # Alias for PR requirements
 async def get_treasury_balance(
     db: Session = Depends(get_db),
     current_user: Optional[str] = Depends(get_optional_user)
