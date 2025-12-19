@@ -2,6 +2,18 @@
 
 Thank you for your interest in contributing to the Pi Forge Quantum Genesis project!
 
+## 🤖 Agent-Assisted Contributions
+
+This repository uses an autonomous agent system to coordinate work. When contributing:
+
+- **Choose the appropriate issue template** - Routes your issue to the relevant agent
+- **Follow the PR template** - Ensures proper handoff documentation
+- **Review the [Handoff Protocol](.github/AGENTS/HANDOFF_PROTOCOL.md)** - Learn the 5-step coordination process
+
+**New to the system?** Start with [Onboarding Agent](.github/AGENTS/ONBOARDING_AGENT.md) for guidance.
+
+See [Canon of Autonomy](.github/CANON_OF_AUTONOMY.md) for governance principles.
+
 ## Getting Started
 
 1. Fork the repository
