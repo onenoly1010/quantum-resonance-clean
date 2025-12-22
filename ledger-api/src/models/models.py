@@ -100,7 +100,7 @@ class LogicalAccount(Base):
     account_name = Column(String(255), nullable=False, unique=True)
     account_type = Column(String(50), nullable=False)
     description = Column(Text)
-    extra_metadata = Column(JSON, default={})
+    custom_metadata = Column(JSON, default={})
     is_active = Column(Boolean, default=True)
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
     updated_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), onupdate=func.now())
@@ -130,7 +130,7 @@ class LedgerTransaction(Base):
     transaction_type = Column(String(50), nullable=False)
     reference_id = Column(String(255))
     description = Column(Text)
-    extra_metadata = Column(JSON, default={})
+    custom_metadata = Column(JSON, default={})
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
     updated_at = Column(TIMESTAMP(timezone=True), server_default=func.now(), onupdate=func.now())
     
