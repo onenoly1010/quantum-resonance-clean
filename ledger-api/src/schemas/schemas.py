@@ -14,7 +14,7 @@ class LogicalAccountBase(BaseModel):
     account_name: str = Field(..., max_length=255)
     account_type: str = Field(..., pattern="^(asset|liability|equity|revenue|expense)$")
     description: Optional[str] = None
-    metadata: Dict[str, Any] = Field(default_factory=dict)
+    metadata: Dict[str, Any] = Field(default_factory=dict, alias='custom_metadata')
     is_active: bool = True
 
 
@@ -28,7 +28,7 @@ class LogicalAccountUpdate(BaseModel):
     account_name: Optional[str] = Field(None, max_length=255)
     account_type: Optional[str] = Field(None, pattern="^(asset|liability|equity|revenue|expense)$")
     description: Optional[str] = None
-    metadata: Optional[Dict[str, Any]] = None
+    metadata: Optional[Dict[str, Any]] = Field(None, alias='custom_metadata')
     is_active: Optional[bool] = None
 
 
@@ -39,24 +39,6 @@ class LogicalAccountResponse(LogicalAccountBase):
     updated_at: datetime
     
     model_config = ConfigDict(from_attributes=True, populate_by_name=True)
-    
-    @classmethod
-    def model_validate(cls, obj):
-        """Custom validation to handle custom_metadata field from database."""
-        if hasattr(obj, 'custom_metadata'):
-            # Map custom_metadata from the database model to metadata in the schema
-            data = {
-                'id': obj.id,
-                'account_name': obj.account_name,
-                'account_type': obj.account_type,
-                'description': obj.description,
-                'metadata': obj.custom_metadata,
-                'is_active': obj.is_active,
-                'created_at': obj.created_at,
-                'updated_at': obj.updated_at
-            }
-            return super().model_validate(data)
-        return super().model_validate(obj)
 
 
 # Ledger Transaction Schemas
@@ -68,7 +50,7 @@ class LedgerTransactionBase(BaseModel):
     transaction_type: str = Field(..., pattern="^(debit|credit)$")
     reference_id: Optional[str] = Field(None, max_length=255)
     description: Optional[str] = None
-    metadata: Dict[str, Any] = Field(default_factory=dict)
+    metadata: Dict[str, Any] = Field(default_factory=dict, alias='custom_metadata')
 
 
 class LedgerTransactionCreate(LedgerTransactionBase):
@@ -84,27 +66,6 @@ class LedgerTransactionResponse(LedgerTransactionBase):
     updated_at: datetime
     
     model_config = ConfigDict(from_attributes=True, populate_by_name=True)
-    
-    @classmethod
-    def model_validate(cls, obj):
-        """Custom validation to handle custom_metadata field from database."""
-        if hasattr(obj, 'custom_metadata'):
-            # Map custom_metadata from the database model to metadata in the schema
-            data = {
-                'id': obj.id,
-                'account_id': obj.account_id,
-                'amount': obj.amount,
-                'currency': obj.currency,
-                'transaction_type': obj.transaction_type,
-                'reference_id': obj.reference_id,
-                'description': obj.description,
-                'metadata': obj.custom_metadata,
-                'transaction_date': obj.transaction_date,
-                'created_at': obj.created_at,
-                'updated_at': obj.updated_at
-            }
-            return super().model_validate(data)
-        return super().model_validate(obj)
 
 
 # Allocation Rule Schemas
