@@ -56,13 +56,13 @@ def create_allocation_rule(
     Requires admin authentication.
     """
     try:
-        db_rule = AllocationService.create_allocation_rule(db, rule)
+        allocation_rule = AllocationService.create_allocation_rule(db, rule)
         
         # Log audit trail
         AuditLogger.log_create(
             db=db,
             entity_type="AllocationRule",
-            entity_id=db_rule.id,
+            entity_id=allocation_rule.id,
             entity_data={
                 "rule_name": rule.rule_name,
                 "source_account_id": str(rule.source_account_id),
@@ -72,7 +72,7 @@ def create_allocation_rule(
             request=request
         )
         
-        return db_rule
+        return allocation_rule
         
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -112,38 +112,38 @@ def update_allocation_rule(
     """
     try:
         # Get old data for audit
-        db_rule = db.query(AllocationRule).filter(
+        allocation_rule = db.query(AllocationRule).filter(
             AllocationRule.id == rule_id
         ).first()
         
-        if not db_rule:
+        if not allocation_rule:
             raise HTTPException(status_code=404, detail="Allocation rule not found")
         
         old_data = {
-            "rule_name": db_rule.rule_name,
-            "is_active": db_rule.is_active
+            "rule_name": allocation_rule.rule_name,
+            "is_active": allocation_rule.is_active
         }
         
         # Update rule
-        db_rule = AllocationService.update_allocation_rule(db, rule_id, rule_update)
+        allocation_rule = AllocationService.update_allocation_rule(db, rule_id, rule_update)
         
         # Log audit trail
         new_data = {
-            "rule_name": db_rule.rule_name,
-            "is_active": db_rule.is_active
+            "rule_name": allocation_rule.rule_name,
+            "is_active": allocation_rule.is_active
         }
         
         AuditLogger.log_update(
             db=db,
             entity_type="AllocationRule",
-            entity_id=db_rule.id,
+            entity_id=allocation_rule.id,
             old_data=old_data,
             new_data=new_data,
             user_id=current_user,
             request=request
         )
         
-        return db_rule
+        return allocation_rule
         
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))

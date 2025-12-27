@@ -28,34 +28,34 @@ def create_transaction(
     Requires authentication.
     """
     # Verify account exists
-    account = db.query(LogicalAccount).filter(
+    account_record = db.query(LogicalAccount).filter(
         LogicalAccount.id == transaction.account_id
     ).first()
     
-    if not account:
+    if not account_record:
         raise HTTPException(status_code=404, detail="Account not found")
     
     # Create transaction
-    db_transaction = LedgerTransaction(
+    transaction_record = LedgerTransaction(
         account_id=transaction.account_id,
         amount=transaction.amount,
         currency=transaction.currency,
         transaction_type=transaction.transaction_type,
         reference_id=transaction.reference_id,
         description=transaction.description,
-        metadata=transaction.metadata,
+        custom_metadata=transaction.metadata,
         transaction_date=transaction.transaction_date or datetime.utcnow()
     )
     
-    db.add(db_transaction)
+    db.add(transaction_record)
     db.commit()
-    db.refresh(db_transaction)
+    db.refresh(transaction_record)
     
     # Log audit trail
     AuditLogger.log_create(
         db=db,
         entity_type="LedgerTransaction",
-        entity_id=db_transaction.id,
+        entity_id=transaction_record.id,
         entity_data={
             "account_id": str(transaction.account_id),
             "amount": str(transaction.amount),
@@ -65,7 +65,7 @@ def create_transaction(
         request=request
     )
     
-    return db_transaction
+    return transaction_record
 
 
 @router.get("", response_model=List[LedgerTransactionResponse])
@@ -129,11 +129,11 @@ def get_account_transactions(
     Requires authentication.
     """
     # Verify account exists
-    account = db.query(LogicalAccount).filter(
+    account_record = db.query(LogicalAccount).filter(
         LogicalAccount.id == account_id
     ).first()
     
-    if not account:
+    if not account_record:
         raise HTTPException(status_code=404, detail="Account not found")
     
     transactions = db.query(LedgerTransaction).filter(

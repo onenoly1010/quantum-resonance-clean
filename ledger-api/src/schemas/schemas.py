@@ -14,7 +14,7 @@ class LogicalAccountBase(BaseModel):
     account_name: str = Field(..., max_length=255)
     account_type: str = Field(..., pattern="^(asset|liability|equity|revenue|expense)$")
     description: Optional[str] = None
-    extra_metadata: Dict[str, Any] = Field(default_factory=dict)
+    metadata: Dict[str, Any] = Field(default_factory=dict, alias='custom_metadata')
     is_active: bool = True
 
 
@@ -28,7 +28,7 @@ class LogicalAccountUpdate(BaseModel):
     account_name: Optional[str] = Field(None, max_length=255)
     account_type: Optional[str] = Field(None, pattern="^(asset|liability|equity|revenue|expense)$")
     description: Optional[str] = None
-    extra_metadata: Optional[Dict[str, Any]] = None
+    metadata: Optional[Dict[str, Any]] = Field(None, alias='custom_metadata')
     is_active: Optional[bool] = None
 
 
@@ -38,7 +38,7 @@ class LogicalAccountResponse(LogicalAccountBase):
     created_at: datetime
     updated_at: datetime
     
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
 
 # Ledger Transaction Schemas
@@ -50,7 +50,7 @@ class LedgerTransactionBase(BaseModel):
     transaction_type: str = Field(..., pattern="^(debit|credit)$")
     reference_id: Optional[str] = Field(None, max_length=255)
     description: Optional[str] = None
-    extra_metadata: Dict[str, Any] = Field(default_factory=dict)
+    metadata: Dict[str, Any] = Field(default_factory=dict, alias='custom_metadata')
 
 
 class LedgerTransactionCreate(LedgerTransactionBase):
@@ -65,7 +65,7 @@ class LedgerTransactionResponse(LedgerTransactionBase):
     created_at: datetime
     updated_at: datetime
     
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
 
 # Allocation Rule Schemas

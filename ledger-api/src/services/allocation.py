@@ -66,16 +66,16 @@ class AllocationService:
         
         # Check if all destination accounts exist
         for config in rule_data.allocation_config:
-            dest_account = db.query(LogicalAccount).filter(
+            destination_account = db.query(LogicalAccount).filter(
                 LogicalAccount.id == config.destination_account_id
             ).first()
-            if not dest_account:
+            if not destination_account:
                 raise ValueError(
                     f"Destination account {config.destination_account_id} not found"
                 )
         
         # Create allocation rule
-        db_rule = AllocationRule(
+        allocation_rule = AllocationRule(
             rule_name=rule_data.rule_name,
             source_account_id=rule_data.source_account_id,
             allocation_config=allocation_config_dicts,
@@ -84,11 +84,11 @@ class AllocationService:
             effective_to=rule_data.effective_to
         )
         
-        db.add(db_rule)
+        db.add(allocation_rule)
         db.commit()
-        db.refresh(db_rule)
+        db.refresh(allocation_rule)
         
-        return db_rule
+        return allocation_rule
     
     @staticmethod
     def update_allocation_rule(
@@ -107,30 +107,30 @@ class AllocationService:
         Returns:
             Updated allocation rule
         """
-        db_rule = db.query(AllocationRule).filter(AllocationRule.id == rule_id).first()
+        allocation_rule = db.query(AllocationRule).filter(AllocationRule.id == rule_id).first()
         
-        if not db_rule:
+        if not allocation_rule:
             raise ValueError(f"Allocation rule {rule_id} not found")
         
         # Update fields if provided
         if rule_data.rule_name is not None:
-            db_rule.rule_name = rule_data.rule_name
+            allocation_rule.rule_name = rule_data.rule_name
         
         if rule_data.allocation_config is not None:
             allocation_config_dicts = [config.model_dump() for config in rule_data.allocation_config]
             AllocationService.validate_allocation_config(allocation_config_dicts)
-            db_rule.allocation_config = allocation_config_dicts
+            allocation_rule.allocation_config = allocation_config_dicts
         
         if rule_data.is_active is not None:
-            db_rule.is_active = rule_data.is_active
+            allocation_rule.is_active = rule_data.is_active
         
         if rule_data.effective_to is not None:
-            db_rule.effective_to = rule_data.effective_to
+            allocation_rule.effective_to = rule_data.effective_to
         
         db.commit()
-        db.refresh(db_rule)
+        db.refresh(allocation_rule)
         
-        return db_rule
+        return allocation_rule
     
     @staticmethod
     def execute_allocation(
@@ -152,17 +152,17 @@ class AllocationService:
             List of created ledger transactions
         """
         # Get allocation rule
-        db_rule = db.query(AllocationRule).filter(
+        allocation_rule = db.query(AllocationRule).filter(
             AllocationRule.id == rule_id,
             AllocationRule.is_active == True
         ).first()
         
-        if not db_rule:
+        if not allocation_rule:
             raise ValueError(f"Active allocation rule {rule_id} not found")
         
         # Sort allocations by priority
         sorted_allocations = sorted(
-            db_rule.allocation_config,
+            allocation_rule.allocation_config,
             key=lambda x: x.get("priority", 999)
         )
         
@@ -170,12 +170,12 @@ class AllocationService:
         
         # Create debit transaction from source account
         source_transaction = LedgerTransaction(
-            account_id=db_rule.source_account_id,
+            account_id=allocation_rule.source_account_id,
             amount=amount,
             transaction_type="debit",
             reference_id=reference_id,
-            description=f"Allocation from rule: {db_rule.rule_name}",
-            metadata={"allocation_rule_id": str(rule_id)}
+            description=f"Allocation from rule: {allocation_rule.rule_name}",
+            custom_metadata={"allocation_rule_id": str(rule_id)}
         )
         db.add(source_transaction)
         transactions.append(source_transaction)
@@ -184,25 +184,25 @@ class AllocationService:
         for config in sorted_allocations:
             allocation_amount = (amount * Decimal(str(config["percentage"]))) / Decimal("100")
             
-            dest_transaction = LedgerTransaction(
+            destination_transaction = LedgerTransaction(
                 account_id=UUID(config["destination_account_id"]),
                 amount=allocation_amount,
                 transaction_type="credit",
                 reference_id=reference_id,
-                description=f"Allocation to {config['percentage']}% from {db_rule.rule_name}",
-                metadata={
+                description=f"Allocation to {config['percentage']}% from {allocation_rule.rule_name}",
+                custom_metadata={
                     "allocation_rule_id": str(rule_id),
                     "percentage": str(config["percentage"]),
                     "priority": config.get("priority", 999)
                 }
             )
-            db.add(dest_transaction)
-            transactions.append(dest_transaction)
+            db.add(destination_transaction)
+            transactions.append(destination_transaction)
         
         db.commit()
         
         # Refresh all transactions
-        for txn in transactions:
-            db.refresh(txn)
+        for transaction in transactions:
+            db.refresh(transaction)
         
         return transactions
