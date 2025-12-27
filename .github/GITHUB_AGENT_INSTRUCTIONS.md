@@ -1,5 +1,7 @@
 # GitHub Agent: Autonomous Ecosystem Coordinator
 
+> **Note on Canon References:** This document references the agent-specific Canon of Autonomy located at `.github/CANON_OF_AUTONOMY.md`, which includes expanded guidelines for autonomous agents. The primary contributor-focused Canon is at the repository root (`../CANON_OF_AUTONOMY.md`).
+
 ## Overview
 
 The **GitHub Agent** is the central coordinator of the autonomous agent ecosystem in this repository. It operates as a router, facilitator, and alignment checker—ensuring all work flows smoothly between specialized agents while maintaining adherence to the Canon of Autonomy.
