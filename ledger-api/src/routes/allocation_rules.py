@@ -61,7 +61,7 @@ def create_allocation_rule(
         AuditLogger.log_create(
             db=db,
             entity_type="AllocationRule",
-            entity_id=db_rule.id,
+            entity_id=allocation_rule.id,
             entity_data={
                 "rule_name": rule.rule_name,
                 "source_account_id": str(rule.source_account_id),
@@ -125,7 +125,7 @@ def update_allocation_rule(
         AuditLogger.log_update(
             db=db,
             entity_type="AllocationRule",
-            entity_id=db_rule.id,
+            entity_id=allocation_rule.id,
             old_data=old_data,
             new_data=new_data,
             user_id=current_user,

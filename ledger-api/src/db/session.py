@@ -39,14 +39,14 @@ def get_db() -> Generator[Session, None, None]:
     
     Usage:
         @app.get("/items")
-        def read_items(db: Session = Depends(get_db)):
-            return db.query(Item).all()
+        def read_items(database_session: Session = Depends(get_db)):
+            return database_session.query(Item).all()
     """
-    db = SessionLocal()
+    database_session = SessionLocal()
     try:
-        yield db
+        yield database_session
     finally:
-        db.close()
+        database_session.close()
 
 
 def init_db():

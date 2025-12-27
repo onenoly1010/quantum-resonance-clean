@@ -136,7 +136,7 @@ class WorkflowPatchAgent:
         issues = []
 
         # Example performance checks
-        perf_checks = [
+        performance_check_types = [
             "database_query_optimization",
             "caching_strategy",
             "async_operations",
@@ -144,6 +144,8 @@ class WorkflowPatchAgent:
         ]
 
         for check in perf_checks:
+        
+        for check in performance_check_types:
             logger.debug(f"Performing performance check: {check}")
 
         return issues
@@ -170,7 +172,7 @@ class WorkflowPatchAgent:
         issues = []
 
         # Example compatibility checks
-        compat_checks = [
+        compatibility_check_types = [
             "dependency_versions",
             "api_compatibility",
             "database_compatibility",
@@ -178,6 +180,8 @@ class WorkflowPatchAgent:
         ]
 
         for check in compat_checks:
+        
+        for check in compatibility_check_types:
             logger.debug(f"Performing compatibility check: {check}")
 
         return issues
@@ -451,7 +455,7 @@ class WorkflowPatchAgent:
         logger.debug("Running compatibility checks")
 
         # Compatibility validation
-        compat_checks = {
+        compatibility_check_results = {
             "database_version": True,
             "api_version": True,
             "dependencies": True,
@@ -460,6 +464,12 @@ class WorkflowPatchAgent:
 
         return {"passed": all(compat_checks.values()), "checks": compat_checks}
 
+        
+        return {
+            "passed": all(compatibility_check_results.values()),
+            "checks": compatibility_check_results
+        }
+    
     def deploy_patch(
         self, patch_id: UUID, approved_by: Optional[str] = None
     ) -> PatchDeploymentReport:
