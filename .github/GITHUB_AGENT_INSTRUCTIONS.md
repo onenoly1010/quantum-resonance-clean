@@ -360,10 +360,10 @@ The agent ecosystem follows this structure:
 ```
 /
 ├── README.md                           # Project introduction
-├── CANON_OF_AUTONOMY.md                # Root governance document
+├── CANON_OF_AUTONOMY.md                # Root governance document (primary)
 ├── .github/
 │   ├── GITHUB_AGENT_INSTRUCTIONS.md    # This file
-│   ├── CANON_OF_AUTONOMY.md            # Canon duplicate for agent access
+│   ├── CANON_OF_AUTONOMY.md            # Agent-specific Canon (expanded version)
 │   ├── copilot-instructions.md         # Technical Copilot guidance
 │   ├── AGENTS/
 │   │   ├── README.md                   # Agent ecosystem overview
@@ -439,7 +439,9 @@ All changes require maintainer approval and must uphold the Canon.
 ## Resources
 
 ### Primary Documents
-- **[Canon of Autonomy](./CANON_OF_AUTONOMY.md)** - Root governance
+- **[Canon of Autonomy](./CANON_OF_AUTONOMY.md)** - Agent-specific Canon (expanded version)
+  - _Note: The root [`../CANON_OF_AUTONOMY.md`](../CANON_OF_AUTONOMY.md) is the primary governance document for contributors_
+  - _This `.github/` version includes additional agent-specific guidelines and protocols_
 - **[Agent Ecosystem Overview](./AGENTS/README.md)** - Full agent details
 - **[Handoff Protocol](./AGENTS/HANDOFF_PROTOCOL.md)** - Work transfer standards
 - **[Copilot Instructions](./copilot-instructions.md)** - Technical AI guidance
