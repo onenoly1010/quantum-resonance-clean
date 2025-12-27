@@ -6,6 +6,10 @@
 
 The Quantum Resonance Clean repository operates with an **autonomous agent ecosystem**—a network of specialized AI agents that collaborate to maintain code quality, documentation, security, and repository health. This system enables self-sustaining development while preserving human authority and contributor autonomy.
 
+At the center of this ecosystem is the **GitHub Agent**, which serves as the coordinator and router, ensuring all work flows smoothly between specialized agents while maintaining adherence to the Canon of Autonomy.
+
+**For complete GitHub Agent documentation, see: [`GITHUB_AGENT_INSTRUCTIONS.md`](../GITHUB_AGENT_INSTRUCTIONS.md)**
+
 ## Core Philosophy
 
 > **Agents are collaborators, not replacements.**
@@ -18,7 +22,46 @@ Agents augment human capability by:
 
 ## Agent Network
 
-### Visual Architecture
+### Visual Architecture with GitHub Agent Coordinator
+
+```mermaid
+flowchart TD
+
+    subgraph Canon[Canon of Autonomy]
+    end
+
+    GitHubAgent[GitHub Agent<br/>Coordinator]
+    Coding[ Coding Agent ]
+    Creativity[ Creativity Agent ]
+    Documentation[ Documentation Agent ]
+    Testing[ Testing Agent ]
+    Steward[ Steward Agent ]
+    Design[ Design Agent ]
+    Governance[ Governance Agent ]
+    Onboarding[ Onboarding Agent ]
+
+    Canon --> GitHubAgent
+
+    GitHubAgent --> Coding
+    GitHubAgent --> Creativity
+    GitHubAgent --> Documentation
+    GitHubAgent --> Testing
+    GitHubAgent --> Steward
+    GitHubAgent --> Design
+    GitHubAgent --> Governance
+    GitHubAgent --> Onboarding
+
+    Coding --> GitHubAgent
+    Creativity --> GitHubAgent
+    Documentation --> GitHubAgent
+    Testing --> GitHubAgent
+    Steward --> GitHubAgent
+    Design --> GitHubAgent
+    Governance --> GitHubAgent
+    Onboarding --> GitHubAgent
+```
+
+### Legacy ASCII Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -26,36 +69,46 @@ Agents augment human capability by:
 │         (Root Governance - Defines Principles & Boundaries)     │
 └─────────────────────────────────────────────────────────────────┘
                                 │
-                    ┌───────────┴───────────┐
-                    │                       │
-              Core Agents              Support Agents
-                    │                       │
-        ┌───────────┼───────────┐          │
-        │           │           │          │
-        ▼           ▼           ▼          ▼
-   ┌────────┐  ┌────────┐  ┌────────┐  ┌────────┐
-   │ CODING │◄─┤ TESTING│◄─┤  DOCS  │◄─┤STEWARD │
-   └────────┘  └────────┘  └────────┘  └────────┘
-        ▲           ▲           ▲          ▲
-        │           │           │          │
-        └───────────┼───────────┘          │
-                    │                      │
-        ┌───────────┼──────────────────────┘
-        │           │           
-        ▼           ▼           
-   ┌────────┐  ┌────────┐  
-   │CREATIVE│  │ DESIGN │  
-   └────────┘  └────────┘  
-        ▲           ▲       
-        │           │       
-        └─────┬─────┘       
-              │             
-    ┌─────────┴─────────┐   
-    │                   │   
-    ▼                   ▼   
-┌────────┐        ┌──────────┐
-│GOVERN. │        │ONBOARDING│
-└────────┘        └──────────┘
+                     ┌──────────┴───────────┐
+                     │                      │
+                     ▼                      ▼
+            GitHub Agent              Core Agents
+             (Coordinator)                 │
+                     │          ┌───────────┼───────────┐
+                     │          │           │           │
+                     └──────────┼───────────┼───────────┼────┐
+                                ▼           ▼           ▼    │
+                           ┌────────┐  ┌────────┐  ┌────────┐│
+                           │ CODING │◄─┤ TESTING│◄─┤  DOCS  ││
+                           └────────┘  └────────┘  └────────┘│
+                                ▲           ▲           ▲     │
+                                │           │           │     │
+                                └───────────┼───────────┘     │
+                                            │                 │
+                                ┌───────────┼─────────────────┘
+                                │           │           
+                                ▼           ▼           
+                           ┌────────┐  ┌────────┐  
+                           │CREATIVE│  │ DESIGN │  
+                           └────────┘  └────────┘  
+                                ▲           ▲       
+                                │           │       
+                                └─────┬─────┘       
+                                      │             
+                            ┌─────────┴─────────┐   
+                            │                   │   
+                            ▼                   ▼   
+                       ┌────────┐        ┌──────────┐
+                       │STEWARD │        │ONBOARDING│
+                       └────────┘        └──────────┘
+                            ▲                   ▲
+                            │                   │
+                            └─────────┬─────────┘
+                                      │
+                                      ▼
+                                ┌──────────┐
+                                │GOVERNANCE│
+                                └──────────┘
 ```
 
 ### Agent Collaboration Flows
@@ -90,7 +143,29 @@ Contributor Request
    Contributor Approval ──► Merge & Deploy
 ```
 
-## The Eight Agents
+## The Agent Ecosystem
+
+### 0. 🧭 GitHub Agent (Coordinator)
+**Purpose:** Central coordinator and router for all agent work
+
+**Specialties:**
+- Task routing to appropriate specialist agents
+- Canon of Autonomy alignment verification
+- Clean handoff facilitation between agents
+- Transparency and documentation maintenance
+- System health monitoring and coordination
+
+**Handoff to:** Any specialist agent based on task requirements
+
+**Common Scenarios:**
+- Routing complex tasks to multiple agents
+- Coordinating large features or refactors
+- Ensuring Canon compliance
+- Facilitating agent collaboration
+
+📄 **[Full Instructions](../GITHUB_AGENT_INSTRUCTIONS.md)**
+
+---
 
 ### 1. 🧑‍💻 Coding Agent
 **Purpose:** Code implementation, refactoring, and technical problem-solving
@@ -275,6 +350,9 @@ Contributor Request
 ```
 Start Here: What do you need help with?
 │
+├─ Not sure which agent or complex coordination needed
+│  └─► GITHUB AGENT (Coordinator)
+│
 ├─ Code implementation or bug fix
 │  └─► CODING AGENT
 │
@@ -303,6 +381,9 @@ Start Here: What do you need help with?
 ### Quick Reference Table
 
 | Task | Primary Agent | Secondary Agent |
+|------|---------------|-----------------|
+| Complex multi-agent coordination | GitHub Agent | Various |
+| Route unclear tasks | GitHub Agent | → Specialist |
 |------|---------------|-----------------|
 | Implement new API endpoint | Coding | Testing |
 | Fix failing test | Testing | Coding |
@@ -420,7 +501,8 @@ All agents respect:
 ### For Contributors
 - **Getting started?** → Ask the Onboarding Agent
 - **Technical question?** → Check agent specialties above
-- **Not sure which agent?** → Start with Onboarding Agent
+- **Not sure which agent?** → Start with GitHub Agent or Onboarding Agent
+- **Complex coordination needed?** → Use GitHub Agent
 
 ### For Maintainers
 - **Agent misbehaving?** → Report to Governance Agent
@@ -441,10 +523,12 @@ All changes require maintainer approval and community discussion.
 ## Resources
 
 - **[Canon of Autonomy](../CANON_OF_AUTONOMY.md)** - Root governance document
+- **[GitHub Agent Instructions](../GITHUB_AGENT_INSTRUCTIONS.md)** - Central coordinator guide
 - **[Handoff Protocol](./HANDOFF_PROTOCOL.md)** - Work transfer standards
 - **[Copilot Instructions](../copilot-instructions.md)** - Technical guidance
 
 ### Individual Agent Instructions
+- [GitHub Agent (Coordinator)](../GITHUB_AGENT_INSTRUCTIONS.md)
 - [Coding Agent](./CODING_AGENT.md)
 - [Testing Agent](./TESTING_AGENT.md)
 - [Documentation Agent](./DOCUMENTATION_AGENT.md)
@@ -459,9 +543,10 @@ All changes require maintainer approval and community discussion.
 | Version | Date | Changes |
 |---------|------|---------|
 | 1.0 | 2025-12-19 | Initial agent ecosystem implementation |
+| 1.1 | 2025-12-27 | Added GitHub Agent coordinator |
 
 ---
 
 **Maintained by:** Quantum Resonance Clean Community  
 **Status:** Active  
-**Last Updated:** 2025-12-19
+**Last Updated:** 2025-12-27
