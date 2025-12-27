@@ -141,9 +141,9 @@ def update_allocation_rule(
 @router.post("/{rule_id}/execute", response_model=List[LedgerTransactionResponse])
 def execute_allocation_rule(
     rule_id: UUID,
-    request: Request,
     amount: Decimal = Query(..., description="Amount to allocate", gt=0),
     reference_id: Optional[str] = Query(None, description="Reference ID for tracking"),
+    request: Request,
     db: Session = Depends(get_db),
     current_user: str = Depends(require_admin),
 ):
