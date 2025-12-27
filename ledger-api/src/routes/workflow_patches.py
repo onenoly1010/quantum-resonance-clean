@@ -13,7 +13,7 @@ from src.db.session import get_db
 from src.deps.auth import require_role
 from src.hooks.audit import AuditLogger
 from src.models.models import WorkflowAnalysis, WorkflowPatch
-from src.schemas.schemas import (PatchDeploymentReport, WorkflowAnalysisCreate,
+from src.schemas.schemas import (PatchDeploymentReport,
                                  WorkflowAnalysisResponse,
                                  WorkflowHealthReport, WorkflowPatchCreate,
                                  WorkflowPatchResponse, WorkflowPatchUpdate)
