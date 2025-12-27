@@ -11,9 +11,11 @@ from uuid import UUID
 from sqlalchemy.orm import Session
 
 from src.models.models import WorkflowAnalysis, WorkflowPatch
-from src.schemas.schemas import (AnalysisFindings, PatchDeploymentReport,
-                                 WorkflowAnalysisCreate, WorkflowHealthReport,
-                                 WorkflowPatchCreate, WorkflowPatchUpdate)
+from src.schemas.schemas import (
+    PatchDeploymentReport,
+    WorkflowHealthReport,
+    WorkflowPatchCreate,
+)
 
 logger = logging.getLogger(__name__)
 
