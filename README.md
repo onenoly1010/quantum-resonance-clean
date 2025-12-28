@@ -6,21 +6,24 @@
 
 This repository provides a clean, production-ready setup for the Pi Forge Quantum Genesis project. It includes automated installation scripts, Docker support, and comprehensive documentation to get you started quickly.
 
-## 🤖 Autonomous Agent Ecosystem
+## 🧭 GitHub Agent: Autonomous Ecosystem Coordinator
 
-This repository uses a multi-agent system governed by the [Canon of Autonomy](.github/CANON_OF_AUTONOMY.md).
+This repository uses a fully autonomous, multi-agent system governed by the Canon of Autonomy.  
+At the center of this ecosystem is the **GitHub Agent**, which acts as the coordinator and router for all work.
 
-### Quick Start
-- **New contributors**: See [`.github/AGENTS/ONBOARDING_AGENT.md`](.github/AGENTS/ONBOARDING_AGENT.md)
-- **Need help?**: Open an issue with the appropriate template
-- **Understanding the system**: Read [`MASTER_HANDOFF_MANIFEST.md`](MASTER_HANDOFF_MANIFEST.md)
+The GitHub Agent:
 
-### Agent System
-- **GitHub Agent** - Coordinates all agents ([`.github/GITHUB_AGENT_INSTRUCTIONS.md`](.github/GITHUB_AGENT_INSTRUCTIONS.md))
-- **8 Specialist Agents** - Coding, Testing, Documentation, Creativity, Design, Steward, Governance, Onboarding
-- **Complete map**: [`.github/AGENTS/README.md`](.github/AGENTS/README.md)
+- Ensures tasks are routed to the correct specialist agent  
+- Maintains alignment with the Canon of Autonomy  
+- Enforces clean handoff between agents  
+- Keeps all work transparent, documented, and contributor-friendly  
+- Ensures the repository remains self-sustaining and non-hierarchical  
 
-The system is designed to be sovereign, transparent, and self-sustaining.
+The GitHub Agent does **not** merge PRs, override contributors, or create hierarchy.  
+It facilitates clarity, continuity, and sovereignty across the entire system.
+
+For full details, see:  
+**[`.github/GITHUB_AGENT_INSTRUCTIONS.md`](.github/GITHUB_AGENT_INSTRUCTIONS.md)**
 
 ## Features
 

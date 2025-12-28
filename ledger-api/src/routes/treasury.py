@@ -59,34 +59,34 @@ def create_account(
     Requires admin authentication.
     """
     # Check if account name already exists
-    existing = db.query(LogicalAccount).filter(
+    existing_account = db.query(LogicalAccount).filter(
         LogicalAccount.account_name == account.account_name
     ).first()
     
-    if existing:
+    if existing_account:
         raise HTTPException(
             status_code=400, 
             detail=f"Account with name '{account.account_name}' already exists"
         )
     
     # Create account
-    db_account = LogicalAccount(
+    account_record = LogicalAccount(
         account_name=account.account_name,
         account_type=account.account_type,
         description=account.description,
-        metadata=account.metadata,
+        custom_metadata=account.metadata,
         is_active=account.is_active
     )
     
-    db.add(db_account)
+    db.add(account_record)
     db.commit()
-    db.refresh(db_account)
+    db.refresh(account_record)
     
     # Log audit trail
     AuditLogger.log_create(
         db=db,
         entity_type="LogicalAccount",
-        entity_id=db_account.id,
+        entity_id=account_record.id,
         entity_data={
             "account_name": account.account_name,
             "account_type": account.account_type
@@ -95,7 +95,7 @@ def create_account(
         request=request
     )
     
-    return db_account
+    return account_record
 
 
 @router.get("/accounts/{account_id}", response_model=LogicalAccountResponse)
@@ -130,57 +130,57 @@ def update_account(
     Update a logical account.
     Requires admin authentication.
     """
-    db_account = db.query(LogicalAccount).filter(
+    account_record = db.query(LogicalAccount).filter(
         LogicalAccount.id == account_id
     ).first()
     
-    if not db_account:
+    if not account_record:
         raise HTTPException(status_code=404, detail="Account not found")
     
     # Store old data for audit
     old_data = {
-        "account_name": db_account.account_name,
-        "account_type": db_account.account_type,
-        "is_active": db_account.is_active
+        "account_name": account_record.account_name,
+        "account_type": account_record.account_type,
+        "is_active": account_record.is_active
     }
     
     # Update fields
     if account_update.account_name is not None:
-        db_account.account_name = account_update.account_name
+        account_record.account_name = account_update.account_name
     
     if account_update.account_type is not None:
-        db_account.account_type = account_update.account_type
+        account_record.account_type = account_update.account_type
     
     if account_update.description is not None:
-        db_account.description = account_update.description
+        account_record.description = account_update.description
     
     if account_update.metadata is not None:
-        db_account.metadata = account_update.metadata
+        account_record.custom_metadata = account_update.metadata
     
     if account_update.is_active is not None:
-        db_account.is_active = account_update.is_active
+        account_record.is_active = account_update.is_active
     
     db.commit()
-    db.refresh(db_account)
+    db.refresh(account_record)
     
     # Log audit trail
     new_data = {
-        "account_name": db_account.account_name,
-        "account_type": db_account.account_type,
-        "is_active": db_account.is_active
+        "account_name": account_record.account_name,
+        "account_type": account_record.account_type,
+        "is_active": account_record.is_active
     }
     
     AuditLogger.log_update(
         db=db,
         entity_type="LogicalAccount",
-        entity_id=db_account.id,
+        entity_id=account_record.id,
         old_data=old_data,
         new_data=new_data,
         user_id=current_user,
         request=request
     )
     
-    return db_account
+    return account_record
 
 
 @router.get("/balance/{account_id}", response_model=AccountBalanceResponse)
@@ -193,11 +193,11 @@ def get_account_balance(
     Get the current balance for an account.
     Requires authentication.
     """
-    account = db.query(LogicalAccount).filter(
+    account_record = db.query(LogicalAccount).filter(
         LogicalAccount.id == account_id
     ).first()
     
-    if not account:
+    if not account_record:
         raise HTTPException(status_code=404, detail="Account not found")
     
     # Calculate balance
@@ -215,7 +215,7 @@ def get_account_balance(
     
     return AccountBalanceResponse(
         account_id=account_id,
-        account_name=account.account_name,
+        account_name=account_record.account_name,
         balance=balance,
         currency="USD",
         last_transaction_date=last_transaction_date

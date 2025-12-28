@@ -1,315 +1,552 @@
-# Agent System Overview
+# Agent Ecosystem Overview
 
-**Purpose:** Multi-agent autonomous coordination for repository operations  
-**Status:** Operational  
-**Version:** 1.0
-
----
+**Autonomous Collaboration Framework for Quantum Resonance Clean**
 
 ## Introduction
 
-This directory contains the instruction sets for all autonomous agents operating within this repository. Each agent is a specialist with clear responsibilities, boundaries, and coordination protocols.
+The Quantum Resonance Clean repository operates with an **autonomous agent ecosystem**—a network of specialized AI agents that collaborate to maintain code quality, documentation, security, and repository health. This system enables self-sustaining development while preserving human authority and contributor autonomy.
 
-The agent system implements the principles defined in the [Canon of Autonomy](../.github/CANON_OF_AUTONOMY.md).
+At the center of this ecosystem is the **GitHub Agent**, which serves as the coordinator and router, ensuring all work flows smoothly between specialized agents while maintaining adherence to the Canon of Autonomy.
+
+**For complete GitHub Agent documentation, see: [`GITHUB_AGENT_INSTRUCTIONS.md`](../GITHUB_AGENT_INSTRUCTIONS.md)**
+
+## Core Philosophy
+
+> **Agents are collaborators, not replacements.**
+
+Agents augment human capability by:
+- Automating routine maintenance tasks
+- Providing specialized expertise on-demand
+- Maintaining consistency across the codebase
+- Enabling rapid iteration with safety checks
+
+## Agent Network
+
+### Visual Architecture with GitHub Agent Coordinator
+
+```mermaid
+flowchart TD
+
+    subgraph Canon[Canon of Autonomy]
+    end
+
+    GitHubAgent[GitHub Agent<br/>Coordinator]
+    Coding[ Coding Agent ]
+    Creativity[ Creativity Agent ]
+    Documentation[ Documentation Agent ]
+    Testing[ Testing Agent ]
+    Steward[ Steward Agent ]
+    Design[ Design Agent ]
+    Governance[ Governance Agent ]
+    Onboarding[ Onboarding Agent ]
+
+    Canon --> GitHubAgent
+
+    GitHubAgent --> Coding
+    GitHubAgent --> Creativity
+    GitHubAgent --> Documentation
+    GitHubAgent --> Testing
+    GitHubAgent --> Steward
+    GitHubAgent --> Design
+    GitHubAgent --> Governance
+    GitHubAgent --> Onboarding
+
+    Coding --> GitHubAgent
+    Creativity --> GitHubAgent
+    Documentation --> GitHubAgent
+    Testing --> GitHubAgent
+    Steward --> GitHubAgent
+    Design --> GitHubAgent
+    Governance --> GitHubAgent
+    Onboarding --> GitHubAgent
+```
+
+### Legacy ASCII Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    CANON OF AUTONOMY                            │
+│         (Root Governance - Defines Principles & Boundaries)     │
+└─────────────────────────────────────────────────────────────────┘
+                                │
+                     ┌──────────┴───────────┐
+                     │                      │
+                     ▼                      ▼
+            GitHub Agent              Core Agents
+             (Coordinator)                 │
+                     │          ┌───────────┼───────────┐
+                     │          │           │           │
+                     └──────────┼───────────┼───────────┼────┐
+                                ▼           ▼           ▼    │
+                           ┌────────┐  ┌────────┐  ┌────────┐│
+                           │ CODING │◄─┤ TESTING│◄─┤  DOCS  ││
+                           └────────┘  └────────┘  └────────┘│
+                                ▲           ▲           ▲     │
+                                │           │           │     │
+                                └───────────┼───────────┘     │
+                                            │                 │
+                                ┌───────────┼─────────────────┘
+                                │           │           
+                                ▼           ▼           
+                           ┌────────┐  ┌────────┐  
+                           │CREATIVE│  │ DESIGN │  
+                           └────────┘  └────────┘  
+                                ▲           ▲       
+                                │           │       
+                                └─────┬─────┘       
+                                      │             
+                            ┌─────────┴─────────┐   
+                            │                   │   
+                            ▼                   ▼   
+                       ┌────────┐        ┌──────────┐
+                       │STEWARD │        │ONBOARDING│
+                       └────────┘        └──────────┘
+                            ▲                   ▲
+                            │                   │
+                            └─────────┬─────────┘
+                                      │
+                                      ▼
+                                ┌──────────┐
+                                │GOVERNANCE│
+                                └──────────┘
+```
+
+### Agent Collaboration Flows
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  Example: New Feature Implementation                        │
+└─────────────────────────────────────────────────────────────┘
+
+Contributor Request
+        │
+        ▼
+   ONBOARDING AGENT ──────► Understands requirements
+        │                   Routes to appropriate agent
+        ▼
+   CODING AGENT ──────────► Implements feature
+        │                   Follows existing patterns
+        │                   Documents decisions
+        ▼
+   TESTING AGENT ─────────► Creates test suite
+        │                   Validates functionality
+        │                   Checks coverage
+        ▼
+   DOCUMENTATION AGENT ───► Updates docs
+        │                   Adds API examples
+        │                   Updates README
+        ▼
+   STEWARD AGENT ─────────► Reviews for consistency
+        │                   Checks technical debt
+        │                   Validates patterns
+        ▼
+   Contributor Approval ──► Merge & Deploy
+```
 
 ## The Agent Ecosystem
 
-### Coordination Layer
+### 0. 🧭 GitHub Agent (Coordinator)
+**Purpose:** Central coordinator and router for all agent work
 
-#### GitHub Agent
-**File:** See `.github/GITHUB_AGENT_INSTRUCTIONS.md` (parent directory)  
-**Role:** Coordinator and facilitator  
-**Responsibilities:**
-- Route work to appropriate specialist agents
-- Ensure handoff protocols are followed
-- Maintain system coherence
-- Bridge between contributors and specialist agents
+**Specialties:**
+- Task routing to appropriate specialist agents
+- Canon of Autonomy alignment verification
+- Clean handoff facilitation between agents
+- Transparency and documentation maintenance
+- System health monitoring and coordination
 
-**Does NOT:**
-- Merge pull requests
-- Approve deployments
-- Override contributor decisions
-- Command other agents
+**Handoff to:** Any specialist agent based on task requirements
 
-### Specialist Agents
+**Common Scenarios:**
+- Routing complex tasks to multiple agents
+- Coordinating large features or refactors
+- Ensuring Canon compliance
+- Facilitating agent collaboration
 
-#### 1. Coding Agent
-**File:** `CODING_AGENT.md`  
-**Domain:** Code implementation, refactoring, technical solutions  
-**When to Use:**
-- Implementing new features
-- Refactoring existing code
-- Bug fixes
-- Code optimization
-- Technical problem-solving
-
-**Labels:** `coding-agent`, `enhancement`, `bug`
+📄 **[Full Instructions](../GITHUB_AGENT_INSTRUCTIONS.md)**
 
 ---
 
-#### 2. Testing Agent
-**File:** `TESTING_AGENT.md`  
-**Domain:** Test creation, coverage analysis, validation  
-**When to Use:**
-- Writing unit tests
-- Integration testing
+### 1. 🧑‍💻 Coding Agent
+**Purpose:** Code implementation, refactoring, and technical problem-solving
+
+**Specialties:**
+- Writing clean, maintainable code
+- Bug fixing and debugging
+- Code refactoring and optimization
+- Pattern recognition and consistency
+- Technical architecture decisions
+
+**Handoff to:** Testing Agent for validation, Documentation Agent for technical docs
+
+**Common Scenarios:**
+- Implementing new features or endpoints
+- Fixing bugs reported in issues
+- Refactoring legacy code
+- Optimizing performance bottlenecks
+
+📄 **[Full Instructions](./CODING_AGENT.md)**
+
+---
+
+### 2. 🧪 Testing Agent
+**Purpose:** Test generation, validation, and quality assurance
+
+**Specialties:**
+- Unit and integration test creation
 - Test coverage analysis
-- Validation strategies
-- Test refactoring
+- CI/CD pipeline configuration
+- Performance and load testing
+- Test pattern consistency
 
-**Labels:** `testing-agent`, `testing`
+**Handoff to:** Documentation Agent for test documentation, Coding Agent if bugs found
 
----
+**Common Scenarios:**
+- Creating tests for new features
+- Improving test coverage
+- Setting up automated testing
+- Debugging test failures
 
-#### 3. Documentation Agent
-**File:** `DOCUMENTATION_AGENT.md`  
-**Domain:** Documentation creation, maintenance, clarity  
-**When to Use:**
-- Writing/updating README files
-- API documentation
-- Code comments
-- Architecture documents
-- Usage guides
-
-**Labels:** `documentation-agent`, `documentation`
+📄 **[Full Instructions](./TESTING_AGENT.md)**
 
 ---
 
-#### 4. Creativity Agent
-**File:** `CREATIVITY_AGENT.md`  
-**Domain:** Naming, concepts, narrative, branding  
-**When to Use:**
-- Naming variables, functions, projects
-- Conceptual framework design
-- Narrative consistency
-- Terminology development
-- Branding decisions
+### 3. 📚 Documentation Agent
+**Purpose:** Technical documentation and knowledge management
 
-**Labels:** `creativity-agent`, `creativity`
+**Specialties:**
+- API documentation generation
+- README and guide creation
+- Code comment standards
+- Tutorial and example creation
+- Documentation site maintenance
 
----
+**Handoff to:** Steward Agent for review, Onboarding Agent for contributor guides
 
-#### 5. Design Agent
-**File:** `DESIGN_AGENT.md`  
-**Domain:** UI/UX, visual design, user experience  
-**When to Use:**
-- User interface design
-- User experience optimization
-- Visual consistency
-- Accessibility improvements
-- Design systems
+**Common Scenarios:**
+- Documenting new APIs
+- Updating setup instructions
+- Creating usage examples
+- Maintaining changelog
 
-**Labels:** `design-agent`, `design`, `ui/ux`
+📄 **[Full Instructions](./DOCUMENTATION_AGENT.md)**
 
 ---
 
-#### 6. Steward Agent
-**File:** `STEWARD_AGENT.md`  
-**Domain:** Repository health, maintenance, optimization  
-**When to Use:**
-- Dependency updates
+### 4. 🎨 Creativity Agent
+**Purpose:** Innovation, design exploration, and user experience optimization
+
+**Specialties:**
+- UI/UX brainstorming
+- Naming conventions
+- Visual design concepts
+- User journey optimization
+- Feature ideation
+
+**Handoff to:** Design Agent for implementation, Coding Agent for technical feasibility
+
+**Common Scenarios:**
+- Exploring new feature ideas
+- Improving user workflows
+- Naming new components
+- Visual asset recommendations
+
+📄 **[Full Instructions](./CREATIVITY_AGENT.md)**
+
+---
+
+### 5. 🎭 Design Agent
+**Purpose:** Design system implementation and visual consistency
+
+**Specialties:**
+- Component library development
+- Design system maintenance
+- Accessibility compliance (WCAG)
+- Visual consistency enforcement
+- Responsive design implementation
+
+**Handoff to:** Coding Agent for technical implementation, Testing Agent for accessibility testing
+
+**Common Scenarios:**
+- Building reusable components
+- Ensuring accessibility standards
+- Implementing design mockups
+- Maintaining visual consistency
+
+📄 **[Full Instructions](./DESIGN_AGENT.md)**
+
+---
+
+### 6. 🛡️ Steward Agent
+**Purpose:** Repository health monitoring and maintenance
+
+**Specialties:**
+- Code quality monitoring
+- Technical debt tracking
+- Pattern consistency validation
+- Contribution review
 - Repository cleanup
-- Performance optimization
-- Technical debt management
-- Infrastructure maintenance
 
-**Labels:** `steward-agent`, `maintenance`
+**Handoff to:** Governance Agent for policy issues, specific agents for remediation
+
+**Common Scenarios:**
+- Reviewing pull requests
+- Identifying technical debt
+- Monitoring repository health
+- Coordinating large refactors
+
+📄 **[Full Instructions](./STEWARD_AGENT.md)**
 
 ---
 
-#### 7. Governance Agent
-**File:** `GOVERNANCE_AGENT.md`  
-**Domain:** Process, Canon interpretation, conflict resolution  
-**When to Use:**
-- Canon interpretation questions
-- Process clarification
+### 7. ⚖️ Governance Agent
+**Purpose:** Policy enforcement and community standards
+
+**Specialties:**
+- Ethical guideline maintenance
+- Policy enforcement
 - Conflict resolution
-- Governance amendments
-- Policy decisions
+- Community standards
+- Canon alignment verification
 
-**Labels:** `governance-agent`, `governance`
+**Handoff to:** Steward Agent for implementation, Onboarding Agent for education
 
----
+**Common Scenarios:**
+- Updating contribution guidelines
+- Resolving conflicts
+- Enforcing code of conduct
+- Maintaining Canon compliance
 
-#### 8. Onboarding Agent
-**File:** `ONBOARDING_AGENT.md`  
-**Domain:** New contributor support, learning paths  
-**When to Use:**
-- New contributor onboarding
-- Repository navigation help
-- Learning resource curation
-- First-time contribution guidance
-- System explanation
-
-**Labels:** `onboarding-agent`, `onboarding`, `good first issue`
+📄 **[Full Instructions](./GOVERNANCE_AGENT.md)**
 
 ---
 
-## How Agents Work Together
+### 8. 🎓 Onboarding Agent
+**Purpose:** New contributor guidance and learning facilitation
 
-### Agent Coordination Principles
+**Specialties:**
+- Setup instructions
+- Contribution workflow guidance
+- Learning path curation
+- First-time contributor support
+- Routing to specialized agents
 
-1. **Peer Collaboration** - Agents work as equals, not in hierarchy
-2. **Clear Boundaries** - Each agent has a defined domain
-3. **Handoff Protocol** - All coordination follows documented protocol
-4. **Transparency** - All agent actions are visible and documented
-5. **Autonomy** - Agents make decisions within their domains
+**Handoff to:** Appropriate specialist agent based on contributor needs
 
-### Common Patterns
+**Common Scenarios:**
+- Helping new contributors get started
+- Explaining project architecture
+- Guiding through first contribution
+- Troubleshooting setup issues
 
-#### Pattern 1: Single Agent
-Simple tasks handled by one agent:
+📄 **[Full Instructions](./ONBOARDING_AGENT.md)**
+
+---
+
+## Agent Selection Guide
+
+### Decision Tree: Which Agent Do I Need?
+
 ```
-Issue → Routing → Coding Agent → PR → Review → Merge
+Start Here: What do you need help with?
+│
+├─ Not sure which agent or complex coordination needed
+│  └─► GITHUB AGENT (Coordinator)
+│
+├─ Code implementation or bug fix
+│  └─► CODING AGENT
+│
+├─ Writing or running tests
+│  └─► TESTING AGENT
+│
+├─ Documentation or examples
+│  └─► DOCUMENTATION AGENT
+│
+├─ Design concept or UX improvement
+│  └─► CREATIVITY AGENT → DESIGN AGENT
+│
+├─ UI component or accessibility
+│  └─► DESIGN AGENT
+│
+├─ Repository health or PR review
+│  └─► STEWARD AGENT
+│
+├─ Policy question or conflict
+│  └─► GOVERNANCE AGENT
+│
+└─ Getting started or general questions
+   └─► ONBOARDING AGENT
 ```
 
-#### Pattern 2: Sequential Handoff
-Complex work passed between agents:
+### Quick Reference Table
+
+| Task | Primary Agent | Secondary Agent |
+|------|---------------|-----------------|
+| Complex multi-agent coordination | GitHub Agent | Various |
+| Route unclear tasks | GitHub Agent | → Specialist |
+|------|---------------|-----------------|
+| Implement new API endpoint | Coding | Testing |
+| Fix failing test | Testing | Coding |
+| Write API documentation | Documentation | Testing |
+| Design new component | Creativity → Design | Coding |
+| Improve accessibility | Design | Testing |
+| Review pull request | Steward | Governance |
+| Update contribution guide | Documentation | Onboarding |
+| Resolve merge conflict | Coding | Steward |
+| Plan new feature | Creativity | Coding |
+| Setup development environment | Onboarding | Coding |
+
+## Working with Agents
+
+### Invoking an Agent
+
+**In GitHub Issues or Pull Requests:**
 ```
-Issue → Creativity Agent (naming) → 
-Coding Agent (implementation) → 
-Testing Agent (validation) → 
-Documentation Agent (docs) → PR
+@agent [agent-name] [request]
+
+Example:
+@agent coding-agent Please implement JWT authentication for the resonance API
+@agent testing-agent Add integration tests for the new authentication flow
 ```
 
-#### Pattern 3: Parallel Work
-Independent tasks by multiple agents:
+**In Copilot Chat:**
 ```
-Issue → Coding Agent (feature A) + Design Agent (UI) → 
-        Merge coordination → Integration
-```
+I need help from the [Agent Name] agent to [specific task]
 
-#### Pattern 4: Governance Escalation
-Questions requiring process interpretation:
-```
-Issue → Initial Agent → Governance Agent (interpretation) → 
-        Resolution → Original Agent (completion)
+Example:
+I need help from the Coding Agent to refactor the quantum resonance calculations
 ```
 
-## The Handoff Protocol
+### What to Expect
 
-Every agent interaction follows the 5-step handoff process defined in `HANDOFF_PROTOCOL.md`:
+**Agents will:**
+- ✅ Explain their approach before implementing
+- ✅ Follow existing code patterns
+- ✅ Ask clarifying questions when needed
+- ✅ Provide proper handoffs with context
+- ✅ Document their decisions
+- ✅ Test their changes
 
-1. **Context Capture** - Current state and background
-2. **Work Summary** - What was accomplished
-3. **Artifact Listing** - Files created/modified
-4. **Next Steps** - Remaining work or recommendations
-5. **Risk Declaration** - Assumptions, concerns, dependencies
+**Agents will NOT:**
+- ❌ Make decisions without contributor input
+- ❌ Override your preferences
+- ❌ Merge or deploy without approval
+- ❌ Break existing functionality
+- ❌ Skip testing or documentation
 
-See [HANDOFF_PROTOCOL.md](HANDOFF_PROTOCOL.md) for complete details.
+## Common Collaboration Patterns
 
-## Using the Agent System
+### Pattern 1: Feature Development
+1. **Onboarding Agent** - Clarifies requirements
+2. **Creativity Agent** - Explores design options
+3. **Coding Agent** - Implements functionality
+4. **Testing Agent** - Validates implementation
+5. **Documentation Agent** - Creates docs
+6. **Steward Agent** - Reviews for consistency
+
+### Pattern 2: Bug Fix
+1. **Coding Agent** - Diagnoses and fixes issue
+2. **Testing Agent** - Creates regression tests
+3. **Steward Agent** - Reviews impact
+4. **Documentation Agent** - Updates if needed
+
+### Pattern 3: Refactoring
+1. **Steward Agent** - Identifies technical debt
+2. **Coding Agent** - Performs refactoring
+3. **Testing Agent** - Ensures no regressions
+4. **Documentation Agent** - Updates architecture docs
+
+### Pattern 4: Design System Work
+1. **Creativity Agent** - Proposes design concepts
+2. **Design Agent** - Creates components
+3. **Coding Agent** - Implements in application
+4. **Testing Agent** - Tests accessibility
+5. **Documentation Agent** - Creates component docs
+
+## Handoff Protocol
+
+All agents follow the standardized **[Handoff Protocol](./HANDOFF_PROTOCOL.md)** which ensures:
+- Complete context transfer
+- Clear next steps
+- Risk documentation
+- Testing status
+
+When receiving a handoff, you'll get:
+1. **Work Summary** - What was done
+2. **Affected Files** - What changed
+3. **Context** - Why decisions were made
+4. **Risks** - What to watch out for
+5. **Next Steps** - What to do next
+6. **Testing Status** - What's validated
+
+## Integration with Existing Systems
+
+### WorkflowPatchAgent
+The existing `ledger-api/src/services/workflow_patch_agent.py` demonstrates autonomous agent patterns that inspired this ecosystem:
+- Automated analysis and issue detection
+- Progressive deployment with rollback
+- Comprehensive testing requirements
+- Guardian role authentication
+
+The agent ecosystem extends these patterns repository-wide.
+
+### Repository Guidelines
+All agents respect:
+- **[CONTRIBUTING.md](../../CONTRIBUTING.md)** - Contribution guidelines
+- **[SECURITY_SUMMARY.md](../../SECURITY_SUMMARY.md)** - Security practices
+- **[Canon of Autonomy](../CANON_OF_AUTONOMY.md)** - Governance principles
+
+## Getting Help
 
 ### For Contributors
+- **Getting started?** → Ask the Onboarding Agent
+- **Technical question?** → Check agent specialties above
+- **Not sure which agent?** → Start with GitHub Agent or Onboarding Agent
+- **Complex coordination needed?** → Use GitHub Agent
 
-**Opening an Issue:**
-1. Choose appropriate issue template (routes to correct agent)
-2. Provide clear context and requirements
-3. Let automation assign agent labels
-4. Agent will respond and coordinate work
+### For Maintainers
+- **Agent misbehaving?** → Report to Governance Agent
+- **New agent type needed?** → Discuss with community
+- **Canon update needed?** → Submit PR with rationale
 
-**During Work:**
-1. Agents document all work using handoff protocol
-2. Check PR descriptions for agent involvement
-3. Review handoff context before continuing work
-4. Add to handoff documentation if you modify agent work
+## Contributing to the Ecosystem
 
-**For Reviews:**
-1. Verify handoff protocol was followed
-2. Check alignment with Canon of Autonomy
-3. Ensure work is documented for resumability
-4. Confirm no single-person dependencies created
+The agent ecosystem itself can evolve! To contribute:
 
-### For Agents
+1. **Propose new agents** - Submit issue with use case
+2. **Improve instructions** - PR to agent markdown files
+3. **Update protocols** - PR to HANDOFF_PROTOCOL.md
+4. **Refine Canon** - PR to CANON_OF_AUTONOMY.md
 
-**Receiving Work:**
-1. Read issue/PR context thoroughly
-2. Check for existing handoff documentation
-3. Identify dependencies on other agents
-4. Begin work within your domain
-
-**Performing Work:**
-1. Follow Canon of Autonomy principles
-2. Stay within your domain boundaries
-3. Document as you work
-4. Coordinate with other agents as needed
-
-**Completing Work:**
-1. Use handoff protocol for documentation
-2. List all modified files
-3. Identify next steps or remaining work
-4. Declare any risks or assumptions
-
-## Agent Activation
-
-### GitHub Agent
-Always active - monitors all issues and PRs
-
-### Specialist Agents
-Activated by:
-- Issue template selection
-- Manual label assignment
-- Cross-agent handoff
-- Automated workflow routing
-
-## System Health
-
-### Monitoring
-- Handoff protocol compliance
-- Agent coordination quality
-- Response times
-- Work quality
-
-### Maintenance
-Regular review of:
-- Agent instruction effectiveness
-- Coordination patterns
-- Process improvements
-- Canon alignment
-
-### Evolution
-The agent system can evolve through:
-- Agent instruction updates
-- New coordination patterns
-- Handoff protocol refinements
-- Canon amendments
-
-## Quick Reference
-
-| Need | Agent | Label | Template |
-|------|-------|-------|----------|
-| Code implementation | Coding Agent | `coding-agent` | feature_request |
-| Tests | Testing Agent | `testing-agent` | testing_request |
-| Documentation | Documentation Agent | `documentation-agent` | documentation_update |
-| Naming/concepts | Creativity Agent | `creativity-agent` | creative_request |
-| UI/UX | Design Agent | `design-agent` | feature_request |
-| Repository health | Steward Agent | `steward-agent` | maintenance |
-| Process questions | Governance Agent | `governance-agent` | governance_issue |
-| Getting started | Onboarding Agent | `onboarding-agent` | help |
-
-## Integration Points
-
-This agent system integrates with:
-- **Canon of Autonomy** - Foundational principles
-- **GitHub Agent Instructions** - Coordinator role
-- **Handoff Protocol** - Coordination process
-- **Issue Templates** - Agent routing
-- **PR Template** - Handoff documentation
-- **GitHub Workflows** - Automation
-- **MASTER_HANDOFF_MANIFEST** - System overview
+All changes require maintainer approval and community discussion.
 
 ## Resources
 
-- [Canon of Autonomy](../CANON_OF_AUTONOMY.md)
-- [GitHub Agent Instructions](../GITHUB_AGENT_INSTRUCTIONS.md)
-- [Handoff Protocol](HANDOFF_PROTOCOL.md)
-- [Master Handoff Manifest](../../MASTER_HANDOFF_MANIFEST.md)
-- [Repository Index](../REPOSITORY_INDEX.md)
+- **[Canon of Autonomy](../CANON_OF_AUTONOMY.md)** - Root governance document
+- **[GitHub Agent Instructions](../GITHUB_AGENT_INSTRUCTIONS.md)** - Central coordinator guide
+- **[Handoff Protocol](./HANDOFF_PROTOCOL.md)** - Work transfer standards
+- **[Copilot Instructions](../copilot-instructions.md)** - Technical guidance
+
+### Individual Agent Instructions
+- [GitHub Agent (Coordinator)](../GITHUB_AGENT_INSTRUCTIONS.md)
+- [Coding Agent](./CODING_AGENT.md)
+- [Testing Agent](./TESTING_AGENT.md)
+- [Documentation Agent](./DOCUMENTATION_AGENT.md)
+- [Creativity Agent](./CREATIVITY_AGENT.md)
+- [Design Agent](./DESIGN_AGENT.md)
+- [Steward Agent](./STEWARD_AGENT.md)
+- [Governance Agent](./GOVERNANCE_AGENT.md)
+- [Onboarding Agent](./ONBOARDING_AGENT.md)
+
+## Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| 1.0 | 2025-12-19 | Initial agent ecosystem implementation |
+| 1.1 | 2025-12-27 | Added GitHub Agent coordinator |
 
 ---
 
-**The agent system exists to empower contributors, not replace them.**  
-**Agents coordinate work; humans make decisions.**  
-**The Canon governs all; no agent is above it.**
-
-*Last Updated: December 2025*
+**Maintained by:** Quantum Resonance Clean Community  
+**Status:** Active  
+**Last Updated:** 2025-12-27

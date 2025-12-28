@@ -85,7 +85,7 @@ class ReconciliationService:
             status = "variance"
         
         # Create reconciliation log
-        db_reconciliation = ReconciliationLog(
+        reconciliation_entry = ReconciliationLog(
             account_id=reconciliation_data.account_id,
             reconciliation_date=reconciliation_data.reconciliation_date,
             expected_balance=reconciliation_data.expected_balance,
@@ -95,11 +95,11 @@ class ReconciliationService:
             reconciled_by=reconciliation_data.reconciled_by
         )
         
-        db.add(db_reconciliation)
+        db.add(reconciliation_entry)
         db.commit()
-        db.refresh(db_reconciliation)
+        db.refresh(reconciliation_entry)
         
-        return db_reconciliation
+        return reconciliation_entry
     
     @staticmethod
     def update_reconciliation(
@@ -118,31 +118,31 @@ class ReconciliationService:
         Returns:
             Updated reconciliation log
         """
-        db_reconciliation = db.query(ReconciliationLog).filter(
+        reconciliation_entry = db.query(ReconciliationLog).filter(
             ReconciliationLog.id == reconciliation_id
         ).first()
         
-        if not db_reconciliation:
+        if not reconciliation_entry:
             raise ValueError(f"Reconciliation log {reconciliation_id} not found")
         
         # Update fields if provided
         if reconciliation_data.status is not None:
-            db_reconciliation.status = reconciliation_data.status
+            reconciliation_entry.status = reconciliation_data.status
             
             # Set resolved_at if status is resolved
             if reconciliation_data.status == "resolved":
-                db_reconciliation.resolved_at = datetime.utcnow()
+                reconciliation_entry.resolved_at = datetime.utcnow()
         
         if reconciliation_data.notes is not None:
-            db_reconciliation.notes = reconciliation_data.notes
+            reconciliation_entry.notes = reconciliation_data.notes
         
         if reconciliation_data.resolved_at is not None:
-            db_reconciliation.resolved_at = reconciliation_data.resolved_at
+            reconciliation_entry.resolved_at = reconciliation_data.resolved_at
         
         db.commit()
-        db.refresh(db_reconciliation)
+        db.refresh(reconciliation_entry)
         
-        return db_reconciliation
+        return reconciliation_entry
     
     @staticmethod
     def get_variance_reconciliations(
