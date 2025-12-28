@@ -698,4 +698,4 @@ This manifest is its map.
 
 ---
 
-*For questions about this system, open an issue with the `governance-issue` template.*
+*For questions about this system, open an issue with the `governance_issue` template.*
