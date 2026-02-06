@@ -145,8 +145,6 @@ class WorkflowPatchAgent:
             "resource_pooling",
         ]
 
-        for check in perf_checks:
-        
         for check in performance_check_types:
             logger.debug(f"Performing performance check: {check}")
 
@@ -181,8 +179,6 @@ class WorkflowPatchAgent:
             "integration_points",
         ]
 
-        for check in compat_checks:
-        
         for check in compatibility_check_types:
             logger.debug(f"Performing compatibility check: {check}")
 
@@ -464,9 +460,6 @@ class WorkflowPatchAgent:
             "existing_workflows": True,
         }
 
-        return {"passed": all(compat_checks.values()), "checks": compat_checks}
-
-        
         return {
             "passed": all(compatibility_check_results.values()),
             "checks": compatibility_check_results

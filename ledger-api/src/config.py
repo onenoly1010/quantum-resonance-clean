@@ -23,7 +23,8 @@ class Settings(BaseSettings):
     ALLOW_ORIGINS: str = "http://localhost:3000,http://localhost:8000"
     
     # Server Configuration
-    HOST: str = "0.0.0.0"
+    # Binding to 0.0.0.0 is intentional for containerized deployment (Docker/Railway)
+    HOST: str = "0.0.0.0"  # nosec B104
     PORT: int = 8001
     
     # Logging

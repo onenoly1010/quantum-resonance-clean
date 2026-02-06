@@ -61,7 +61,7 @@ def create_allocation_rule(
         AuditLogger.log_create(
             db=db,
             entity_type="AllocationRule",
-            entity_id=allocation_rule.id,
+            entity_id=db_rule.id,
             entity_data={
                 "rule_name": rule.rule_name,
                 "source_account_id": str(rule.source_account_id),
@@ -125,7 +125,7 @@ def update_allocation_rule(
         AuditLogger.log_update(
             db=db,
             entity_type="AllocationRule",
-            entity_id=allocation_rule.id,
+            entity_id=rule_id,
             old_data=old_data,
             new_data=new_data,
             user_id=current_user,
@@ -141,9 +141,9 @@ def update_allocation_rule(
 @router.post("/{rule_id}/execute", response_model=List[LedgerTransactionResponse])
 def execute_allocation_rule(
     rule_id: UUID,
+    request: Request,
     amount: Decimal = Query(..., description="Amount to allocate", gt=0),
     reference_id: Optional[str] = Query(None, description="Reference ID for tracking"),
-    request: Request,
     db: Session = Depends(get_db),
     current_user: str = Depends(require_admin),
 ):
