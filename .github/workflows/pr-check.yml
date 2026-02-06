@@ -22,7 +22,7 @@ jobs:
             const isCopilot = context.payload.pull_request.user.login === 'Copilot';
             
             if (!hasHandoff || !hasAgentInvolvement) {
-              // Skip commenting on bot PRs due to permission restrictions
+              // Skip commenting on bot PRs (permission restrictions and automated workflows)
               if (isDependabot) {
                 console.log('Dependabot PR detected - skipping comment due to token restrictions');
                 return;
