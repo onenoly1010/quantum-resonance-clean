@@ -20,10 +20,16 @@ jobs:
         with:
           script: |
             const isDependabot = context.payload.pull_request.user.login === 'dependabot[bot]';
+            const isCopilot = context.payload.pull_request.user.login === 'Copilot';
             
-            // Skip commenting on Dependabot PRs due to permission restrictions
+            // Skip commenting on Dependabot and Copilot PRs due to permission restrictions
             if (isDependabot) {
               console.log('Dependabot PR detected - skipping comment due to token restrictions');
+              return;
+            }
+            
+            if (isCopilot) {
+              console.log('Copilot PR detected - skipping comment due to token restrictions');
               return;
             }
             
