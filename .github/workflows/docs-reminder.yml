@@ -11,11 +11,28 @@ on:
 jobs:
   docs-check:
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      issues: write
     steps:
       - name: Remind about docs
         uses: actions/github-script@v7
         with:
           script: |
+            const isDependabot = context.payload.pull_request.user.login === 'dependabot[bot]';
+            const isCopilot = context.payload.pull_request.user.login === 'Copilot';
+            
+            // Skip commenting on Dependabot and Copilot PRs due to permission restrictions
+            if (isDependabot) {
+              console.log('Dependabot PR detected - skipping comment due to token restrictions');
+              return;
+            }
+            
+            if (isCopilot) {
+              console.log('Copilot PR detected - skipping comment due to token restrictions');
+              return;
+            }
+            
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
