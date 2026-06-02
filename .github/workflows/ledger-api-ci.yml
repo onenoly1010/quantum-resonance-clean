@@ -54,7 +54,7 @@ jobs:
       working-directory: ledger-api
       env:
         DATABASE_URL: postgresql://ledger_user:test_password@localhost:5432/ledger_test_db
-        JWT_SECRET_KEY: test-secret-key-for-ci
+        JWT_SECRET_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
       run: |
         pytest tests/ -v --cov=src --cov-report=xml --cov-report=term
     
