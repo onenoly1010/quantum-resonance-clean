@@ -5,9 +5,10 @@ JWT authentication dependencies for protected endpoints.
 from datetime import datetime, timedelta
 from typing import Optional
 
+import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from jose import JWTError, jwt
+from jwt import PyJWTError
 
 from src.config import settings
 
@@ -70,7 +71,7 @@ def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)) 
 
         return payload
 
-    except JWTError:
+    except PyJWTError:
         raise credentials_exception
 
 
