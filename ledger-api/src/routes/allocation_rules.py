@@ -13,9 +13,12 @@ from src.db.session import get_db
 from src.deps.auth import get_current_user, require_admin
 from src.hooks.audit import AuditLogger
 from src.models.models import AllocationRule
-from src.schemas.schemas import (AllocationRuleCreate, AllocationRuleResponse,
-                                 AllocationRuleUpdate,
-                                 LedgerTransactionResponse)
+from src.schemas.schemas import (
+    AllocationRuleCreate,
+    AllocationRuleResponse,
+    AllocationRuleUpdate,
+    LedgerTransactionResponse,
+)
 from src.services.allocation import AllocationService
 
 router = APIRouter(prefix="/allocation-rules", tags=["Allocation Rules"])

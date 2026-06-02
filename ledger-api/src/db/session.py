@@ -2,19 +2,20 @@
 Database session management for Ledger API.
 Provides SQLAlchemy engine and session factory.
 """
+
+from typing import Generator
+
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, Session
-from typing import Generator
+from sqlalchemy.orm import Session, sessionmaker
+
 from src.config import settings
 
 # Create SQLAlchemy engine
 # SQLite doesn't support pool_size and max_overflow
 if settings.DATABASE_URL.startswith("sqlite"):
     engine = create_engine(
-        settings.DATABASE_URL,
-        connect_args={"check_same_thread": False},
-        echo=False
+        settings.DATABASE_URL, connect_args={"check_same_thread": False}, echo=False
     )
 else:
     engine = create_engine(
@@ -22,7 +23,7 @@ else:
         pool_pre_ping=True,
         pool_size=10,
         max_overflow=20,
-        echo=False
+        echo=False,
     )
 
 # Create SessionLocal class
@@ -36,7 +37,7 @@ def get_db() -> Generator[Session, None, None]:
     """
     Dependency function to get database session.
     Yields a database session and ensures it's closed after use.
-    
+
     Usage:
         @app.get("/items")
         def read_items(database_session: Session = Depends(get_db)):
@@ -55,4 +56,5 @@ def init_db():
     Creates all tables defined in models.
     """
     from src.models import models  # Import here to avoid circular imports
+
     Base.metadata.create_all(bind=engine)

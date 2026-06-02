@@ -462,9 +462,9 @@ class WorkflowPatchAgent:
 
         return {
             "passed": all(compatibility_check_results.values()),
-            "checks": compatibility_check_results
+            "checks": compatibility_check_results,
         }
-    
+
     def deploy_patch(
         self, patch_id: UUID, approved_by: Optional[str] = None
     ) -> PatchDeploymentReport:

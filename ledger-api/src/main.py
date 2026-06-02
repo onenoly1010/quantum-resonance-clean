@@ -1,10 +1,12 @@
 """
 Main FastAPI application for Ledger API.
 """
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
 from src.config import settings
-from src.routes import transactions, treasury, allocation_rules, workflow_patches
+from src.routes import allocation_rules, transactions, treasury, workflow_patches
 
 # Create FastAPI app
 app = FastAPI(
@@ -12,7 +14,7 @@ app = FastAPI(
     description="Single source of truth ledger for logical accounts, transactions, and allocation rules",
     version="1.0.0",
     docs_url="/docs",
-    redoc_url="/redoc"
+    redoc_url="/redoc",
 )
 
 # Configure CORS
@@ -34,27 +36,16 @@ app.include_router(workflow_patches.router, prefix=settings.API_V1_PREFIX)
 @app.get("/")
 def root():
     """Root endpoint."""
-    return {
-        "message": "Ledger API",
-        "version": "1.0.0",
-        "docs": "/docs"
-    }
+    return {"message": "Ledger API", "version": "1.0.0", "docs": "/docs"}
 
 
 @app.get("/health")
 def health_check():
     """Health check endpoint."""
-    return {
-        "status": "healthy",
-        "service": "ledger-api"
-    }
+    return {"status": "healthy", "service": "ledger-api"}
 
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(
-        "src.main:app",
-        host=settings.HOST,
-        port=settings.PORT,
-        reload=True
-    )
+
+    uvicorn.run("src.main:app", host=settings.HOST, port=settings.PORT, reload=True)
