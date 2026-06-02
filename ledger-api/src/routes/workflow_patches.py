@@ -13,10 +13,14 @@ from src.db.session import get_db
 from src.deps.auth import require_role
 from src.hooks.audit import AuditLogger
 from src.models.models import WorkflowAnalysis, WorkflowPatch
-from src.schemas.schemas import (PatchDeploymentReport,
-                                 WorkflowAnalysisResponse,
-                                 WorkflowHealthReport, WorkflowPatchCreate,
-                                 WorkflowPatchResponse, WorkflowPatchUpdate)
+from src.schemas.schemas import (
+    PatchDeploymentReport,
+    WorkflowAnalysisResponse,
+    WorkflowHealthReport,
+    WorkflowPatchCreate,
+    WorkflowPatchResponse,
+    WorkflowPatchUpdate,
+)
 from src.services.workflow_patch_agent import WorkflowPatchAgent
 
 router = APIRouter(prefix="/workflow-patch-agent", tags=["Workflow Patch Agent"])
