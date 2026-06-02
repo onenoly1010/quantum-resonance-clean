@@ -4,10 +4,10 @@ export default function Home() {
       <div className="text-center">
         <h1 className="text-4xl font-bold mb-4">Quantum Resonance</h1>
         <p className="text-xl text-gray-600">
-          Pi Forge Quantum Genesis - Powered by Vercel
+          Pi Forge Quantum Genesis - Recovered on Cloudflare Pages
         </p>
         <p className="text-sm text-gray-500 mt-8">
-          ✨ Vercel Speed Insights enabled
+          ✨ Cloudflare Pages recovery active
         </p>
       </div>
     </main>
