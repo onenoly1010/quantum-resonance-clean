@@ -3,14 +3,20 @@ QPF Prototype – Seed script.
 
 Populates provenance.db with:
   1. A sample creation event and artifact (demonstrates normal operation).
-  2. Challenge #1: the UUID-reconstruction weakness (KNOWN_LIMITATION).
+  2. Challenge #1: the UUID-reconstruction weakness.
+  3. A challenge_results row recording the known v1 behavior (INCONCLUSIVE —
+     the challenge has not yet been executed by a skeptical stranger).
+
+Challenge rows are immutable after insertion.  The original challenge
+definition will not change as the system evolves; future test attempts
+add new challenge_results rows against the same challenge_id.
 
 Run once:  python seed.py
 """
 
 import os
 import sys
-from provenance import record_creation, record_artifact, record_challenge
+from provenance import record_creation, record_artifact, record_challenge, record_challenge_result
 from schema import open_db
 
 DB = "provenance.db"
@@ -38,7 +44,7 @@ def seed():
     artifact_id = record_artifact(DB, event_id, ARTIFACT)
     print(f"artifact:       {artifact_id}")
 
-    # --- Challenge #1: UUID-reconstruction weakness ---
+    # --- Challenge #1: UUID-reconstruction weakness (immutable definition) ---
     challenge_id = record_challenge(
         db_path=DB,
         claim=(
@@ -57,14 +63,28 @@ def seed():
             "verification against the reconstructed chain.  Compare the result to "
             "verification of the authentic chain."
         ),
+    )
+    print(f"challenge:      {challenge_id}")
+
+    # --- Result #1: known v1 behavior, not yet stranger-tested ---
+    # Status is INCONCLUSIVE because the challenge has not yet been executed
+    # by an independent adversary.  The verifier is known to perform only
+    # internal consistency checks, but whether a stranger will exploit this
+    # is what the test determines.
+    result_id = record_challenge_result(
+        db_path=DB,
+        challenge_id=challenge_id,
+        system_version="v1-prototype",
+        tester_id="prototype-seed-self-analysis",
         observed_result=(
-            "Known v1 behavior: reconstruction is currently accepted.  "
-            "The verifier passes a chain with new UUIDs and recomputed hashes "
-            "because it performs only internal consistency checks."
+            "Self-analysis only (not a stranger test).  The verifier performs "
+            "internal consistency checks only.  A chain with new UUIDs and "
+            "recomputed hashes is expected to pass based on code inspection.  "
+            "Empirical confirmation by an independent adversary: PENDING."
         ),
+        status="INCONCLUSIVE",
         ruled_out=(
-            "Nothing about adversarial reconstruction has been ruled out.  "
-            "This challenge has not yet been executed against a skeptical stranger."
+            "Nothing.  No independent adversarial reconstruction has been attempted."
         ),
         unresolved=(
             "Whether provenance can distinguish an authentic historical chain from "
@@ -74,18 +94,19 @@ def seed():
             "human signatures, hardware-backed signatures, external publication, "
             "append-only witnesses, multiple independent witnesses, "
             "content-addressed storage, transparency logs.  "
-            "None of these are to be assumed correct; each is a hypothesis to test."
+            "None of these are assumed correct; each is a hypothesis to test."
         ),
-        status="KNOWN_LIMITATION",
     )
-    print(f"challenge:      {challenge_id}")
+    print(f"result:         {result_id}")
     print()
     print("Seeding complete.")
     print("Run  python verify.py  to check integrity of the seeded chain.")
     print()
     print("IMPORTANT: A passing verification does not establish authenticity.")
-    print("See challenge #1 (UUID_RECONSTRUCTION_WEAKNESS) for what remains unresolved.")
+    print("Challenge #1 is immutable.  Record stranger-test outcomes via")
+    print("record_challenge_result() against the same challenge_id.")
 
 
 if __name__ == "__main__":
     seed()
+

@@ -56,21 +56,49 @@ def record_challenge(
     claim: str,
     failure_hypothesis: str,
     test_description: str,
-    observed_result: str | None = None,
-    ruled_out: str | None = None,
-    unresolved: str | None = None,
-    status: str = "OPEN",
 ) -> str:
-    """Insert a challenge record; return its challenge_id."""
+    """Insert an immutable challenge definition; return its challenge_id.
+
+    Challenge rows cannot be modified after insertion (enforced by a
+    database trigger).  To record the outcome of executing a challenge,
+    use record_challenge_result().
+    """
     conn = open_db(db_path)
     challenge_id = str(uuid.uuid4())
     conn.execute(
-        "INSERT INTO challenges VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        "INSERT INTO challenges VALUES (?, ?, ?, ?, ?)",
+        (challenge_id, claim, failure_hypothesis, test_description, _now()),
+    )
+    conn.commit()
+    conn.close()
+    return challenge_id
+
+
+def record_challenge_result(
+    db_path: str,
+    challenge_id: str,
+    system_version: str,
+    tester_id: str,
+    observed_result: str,
+    status: str,
+    ruled_out: str | None = None,
+    unresolved: str | None = None,
+) -> str:
+    """Record the outcome of one execution attempt against a frozen challenge.
+
+    Multiple results rows may exist for the same challenge_id, one per
+    system version or tester.  The challenge definition itself is never
+    modified.
+    """
+    conn = open_db(db_path)
+    result_id = str(uuid.uuid4())
+    conn.execute(
+        "INSERT INTO challenge_results VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
         (
+            result_id,
             challenge_id,
-            claim,
-            failure_hypothesis,
-            test_description,
+            system_version,
+            tester_id,
             observed_result,
             ruled_out,
             unresolved,
@@ -80,4 +108,4 @@ def record_challenge(
     )
     conn.commit()
     conn.close()
-    return challenge_id
+    return result_id

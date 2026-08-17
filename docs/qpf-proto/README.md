@@ -10,27 +10,49 @@ creation-provenance system.  No frameworks.  No external dependencies.
 ```
 provenance.db
     │
-    ├── creation_events   when something was created and by whom
-    ├── artifacts         content hashes linked to creation events
-    └── challenges        structured test records
+    ├── creation_events    when something was created and by whom
+    ├── artifacts          content hashes linked to creation events
+    ├── challenges         immutable challenge definitions
+    └── challenge_results  outcomes of executing a challenge (one per attempt)
 ```
 
+`challenges` rows are **immutable** — enforced by a database trigger.
+No challenge definition may be altered after insertion.
+
+`challenge_results` records each execution attempt against a frozen
+challenge.  Multiple result rows may exist per challenge, one per
+system version or tester:
+
+```
+same challenge_id → system v1 → result (INCONCLUSIVE: not yet stranger-tested)
+same challenge_id → system v1 → result (stranger attempt #1)
+same challenge_id → system v2 → result (after any change)
+```
+
+This produces a verifiable empirical history: same question, different
+answers over time.
+
 `challenges` is **not** an evidence ledger and **not** a proof ledger.
-It is a test record.  Each row answers:
+It is a test record.  Each challenge row answers:
 
 | Column | Question |
 |---|---|
 | `claim` | What is the system supposed to do? |
 | `failure_hypothesis` | Specifically how might that claim be false? |
-| `test_description` | How was / will the challenge be run? |
+| `test_description` | How is the challenge to be run? |
+
+Each `challenge_results` row answers:
+
+| Column | Question |
+|---|---|
 | `observed_result` | What actually happened? |
 | `ruled_out` | What does the result eliminate? (stated narrowly) |
-| `unresolved` | What remains open after the test? |
-| `status` | OPEN / PASSED / FAILED / KNOWN_LIMITATION |
+| `unresolved` | What remains open after this attempt? |
+| `status` | PASSED / FAILED / INCONCLUSIVE |
 
-A row with `status = PASSED` establishes only that the stated challenge
-did not falsify the system under the stated conditions.  It does not
-establish correctness.
+A result with `status = PASSED` establishes only that this particular
+attempt did not falsify the system under the stated conditions.  It does
+not establish correctness.
 
 ---
 
@@ -71,10 +93,10 @@ skeptical-stranger test.
 
 | File | Purpose |
 |---|---|
-| `schema.py` | DDL + `open_db()` helper |
-| `provenance.py` | Record creation events, artifacts, challenges |
+| `schema.py` | DDL + `open_db()` helper; immutability trigger on challenges |
+| `provenance.py` | Record creation events, artifacts, challenges, and results |
 | `verifier.py` | Integrity checks (not authenticity checks) |
-| `seed.py` | Populate DB with sample event + challenge #1 |
+| `seed.py` | Populate DB with sample event + challenge #1 + result #1 |
 | `verify.py` | Run verifier and print structured report |
 
 ---
