@@ -82,8 +82,7 @@ def seed():
             "recomputed hashes is expected to pass based on code inspection.  "
             "Empirical confirmation by an independent adversary: PENDING."
         ),
-        status="INCONCLUSIVE",
-        ruled_out=(
+        status="INCONCLUSIVE",        ruled_out=(
             "Nothing.  No independent adversarial reconstruction has been attempted."
         ),
         unresolved=(

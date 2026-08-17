@@ -48,11 +48,11 @@ Each `challenge_results` row answers:
 | `observed_result` | What actually happened? |
 | `ruled_out` | What does the result eliminate? (stated narrowly) |
 | `unresolved` | What remains open after this attempt? |
-| `status` | PASSED / FAILED / INCONCLUSIVE |
+| `status` | PASS / FAIL / INCONCLUSIVE / NOT_RUN / SUPERSEDED |
 
-A result with `status = PASSED` establishes only that this particular
+A result with `status = PASS` establishes only that this particular
 attempt did not falsify the system under the stated conditions.  It does
-not establish correctness.
+not establish correctness.  `PROVEN` is intentionally absent.
 
 ---
 
@@ -98,10 +98,59 @@ skeptical-stranger test.
 | `verifier.py` | Integrity checks (not authenticity checks) |
 | `seed.py` | Populate DB with sample event + challenge #1 + result #1 |
 | `verify.py` | Run verifier and print structured report |
+| `watch_loop.py` | Autonomous adversarial loop: attacks the prototype, records results |
 
 ---
 
-## Quick start
+## Watch Loop: autonomous adversarial testing
+
+`watch_loop.py` is the smallest autonomous adversarial loop that attacks
+the existing provenance prototype, records the result, and leaves
+INCONCLUSIVE alone when the evidence is not sufficient.
+
+```bash
+# Run one cycle (prints results, exits)
+python watch_loop.py --once
+
+# Run continuously (default: 60s between cycles)
+python watch_loop.py
+
+# Against a specific database, labelled version
+python watch_loop.py --once --db provenance.db --version v1-prototype
+```
+
+The loop does **not** declare the system correct.
+`PROVEN` is absent from the result vocabulary by design.
+
+**Result vocabulary:**
+
+| Status | Meaning |
+|---|---|
+| `PASS` | The attempted challenge did not falsify the tested claim. |
+| `FAIL` | The challenge falsified the tested claim under stated conditions. |
+| `INCONCLUSIVE` | The challenge cannot currently establish either outcome. |
+| `NOT_RUN` | Defined but not executed in this cycle. |
+| `SUPERSEDED` | Replaced by a later challenge definition. |
+
+**What the first cycle produces:**
+
+- `FAIL` — UUID_RECONSTRUCTION_WEAKNESS: the v1 verifier accepts a
+  structurally valid counterfeit chain.  This is the known weakness.
+  Recording it as FAIL is correct; it is not a loop bug.
+- `PASS` — HASH_TAMPER_DETECTION: the verifier correctly flags a modified
+  artifact file.
+- `PASS` — ORPHAN_ARTIFACT_DETECTION: the verifier correctly flags an
+  artifact with no parent event.
+- `INCONCLUSIVE` — INTEGRITY_VS_AUTHENTICITY_BOUNDARY: no automated test
+  can determine whether an external anchor is present.  Preserved as-is.
+
+Every cycle appends rows to `challenge_results`.  The history is permanent.
+The loop can run all night.  Conclusions belong to a human or independently
+justified authority.
+
+---
+
+
 
 ```bash
 cd /tmp/qpf-proto

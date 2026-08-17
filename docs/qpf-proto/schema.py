@@ -8,7 +8,7 @@ provenance.db contains three tables:
 
 'challenges' records what was tested, what happened, what was ruled out,
 and what remains unresolved.  Nothing in this table constitutes a warrant
-or proof.  A row with status=PASSED establishes only that the particular
+or proof.  A row with status=PASS establishes only that the particular
 challenge did not falsify the system under the stated conditions.
 """
 
@@ -67,8 +67,8 @@ CREATE TABLE IF NOT EXISTS challenge_results (
     observed_result TEXT NOT NULL,      -- what actually happened
     ruled_out      TEXT,                -- what the result eliminates (narrow)
     unresolved     TEXT,                -- what remains open after this attempt
-    status         TEXT NOT NULL        -- PASSED | FAILED | INCONCLUSIVE
-        CHECK(status IN ('PASSED', 'FAILED', 'INCONCLUSIVE')),
+    status         TEXT NOT NULL        -- PASS | FAIL | INCONCLUSIVE | NOT_RUN | SUPERSEDED
+        CHECK(status IN ('PASS', 'FAIL', 'INCONCLUSIVE', 'NOT_RUN', 'SUPERSEDED')),
     executed_at    TEXT NOT NULL        -- ISO-8601 UTC
 );
 """
