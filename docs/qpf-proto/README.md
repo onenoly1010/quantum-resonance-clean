@@ -122,6 +122,27 @@ python watch_loop.py --once --db provenance.db --version v1-prototype
 The loop does **not** declare the system correct.
 `PROVEN` is absent from the result vocabulary by design.
 
+**Repair provenance rule (hard constraint):**
+
+A `FAIL` result is never erased by fixing the system.  If a challenge
+produces FAIL, the loop records it.  A proposed change is an observation,
+not an action.  The correct sequence:
+
+```
+challenge → FAIL
+        ↓
+proposed change recorded (observation only)
+        ↓
+new version built independently
+        ↓
+independent challenge execution against new version
+        ↓
+new result row appended
+```
+
+v1 remains v1.  Its failures remain real.  v2 earns its own record.
+Improvements create new history; they do not rewrite old history.
+
 **Result vocabulary:**
 
 | Status | Meaning |

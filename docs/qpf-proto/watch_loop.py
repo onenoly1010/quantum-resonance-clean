@@ -11,6 +11,26 @@ WHAT THIS DOES NOT DO
   It does not promote a passing result to "proven".
   It does not resolve INCONCLUSIVE rows.
   It does not erase failures.
+  It does not modify the system under test and then use the modified system
+  as evidence that the modification succeeded.
+
+REPAIR PROVENANCE RULE (hard constraint)
+  If a challenge produces FAIL, the watch loop may record a proposed change
+  alongside the result, but it may NOT apply that change to the system under
+  test and re-run as if the failure never occurred.  The correct sequence is:
+
+      challenge → FAIL
+              ↓
+      proposed change recorded (as an observation, not an action)
+              ↓
+      new system version built independently
+              ↓
+      independent challenge execution against new version
+              ↓
+      new result row appended
+
+  v1 remains v1.  Its failure remains real.  v2 earns its own record.
+  Improvements create new history; they do not rewrite old history.
 
 RESULT VOCABULARY
   PASS         – the attempted challenge did not falsify the tested claim.
@@ -517,6 +537,8 @@ def _print_summary(summary: dict, cycle_n: int) -> None:
     print("        FAIL means the challenge falsified the claim under stated conditions.")
     print("        INCONCLUSIVE is preserved, not resolved.")
     print("        Conclusions, if any, belong to a human or designated authority.")
+    print("        REPAIR RULE: a FAIL is not erased by fixing the system.")
+    print("        v1 failures remain real. v2 earns its own record.")
     print("=" * 64)
 
 
