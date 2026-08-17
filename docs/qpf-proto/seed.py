@@ -45,11 +45,11 @@ def seed():
             "The verifier detects unauthorized reconstruction of a creation history."
         ),
         failure_hypothesis=(
-            "A complete history can be reconstructed with new UUIDs and accepted as "
-            "valid because the verifier has no external anchor.  An adversary who "
-            "obtains the artifact files can generate a structurally valid chain that "
-            "passes all verifier checks despite having no relationship to the original "
-            "creation event."
+            "A sufficiently capable adversary can reconstruct a structurally valid "
+            "history that the v1 verifier accepts as authentic, because the verifier "
+            "has no external anchor and performs only internal consistency checks.  "
+            "This is a hypothesis.  Whether it survives the skeptical-stranger test "
+            "is what the test determines."
         ),
         test_description=(
             "Construct an independently generated chain representing the same apparent "

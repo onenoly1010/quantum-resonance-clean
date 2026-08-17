@@ -11,7 +11,7 @@ What it does NOT check, and cannot check:
   - Whether the recorded timestamps reflect when events actually occurred.
 
 These are INTEGRITY checks.  They say nothing about AUTHENTICITY.
-A perfectly forged chain with new UUIDs and recomputed hashes will pass.
+A reconstructed chain with new UUIDs and recomputed hashes is hypothesized to pass.
 See challenges table, challenge #1 (UUID_RECONSTRUCTION_WEAKNESS).
 """
 

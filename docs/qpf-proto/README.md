@@ -90,7 +90,30 @@ python verify.py    # integrity check – will PASS
 
 ---
 
-## Graduation criteria
+## Next gate: skeptical-stranger test
+
+Give someone the database, verifier, artifact, and challenge. Let them attack it.
+Record exactly what happens.
+
+Three possible outcomes — all valid findings:
+
+**If the reconstruction succeeds:**
+Record: *Internal integrity does not establish historical authenticity.*
+That is a significant empirical result.
+
+**If the reconstruction fails:**
+Do not conclude: *"Integrity therefore equals authenticity."*
+Record: *This particular reconstruction attempt did not falsify the verifier's
+authenticity boundary.*  Then design a stronger attack.
+
+**If something unexpected happens:**
+Record it without forcing it into success/failure.
+The `challenges` schema exists precisely for this case.
+
+No blockchain. No new authority. No premature fix.
+The experiment decides what the prototype actually demonstrates.
+
+
 
 This prototype graduates to the canonical repo only after:
 
